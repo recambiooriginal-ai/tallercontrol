@@ -1192,8 +1192,16 @@ function selChip(el,inputId){
 }
 function simularFoto(){document.getElementById('img-upload-text').textContent='✅ Fotografía adjunta: foto.jpg';}
 
-// INICIO — ocultar loading
-setLoading(false);
-</script>
-</body>
-</html>
+// INICIO — cargar usuarios antes de mostrar login
+cargarUsuariosInicial();
+
+function cargarUsuariosInicial(){
+  supaGet('usuarios').then(function(res){
+    var us = Array.isArray(res) ? res : [];
+    USUARIOS = {};
+    us.forEach(function(u){ USUARIOS[u.key] = u; });
+    setLoading(false);
+  }).catch(function(){
+    setLoading(false);
+  });
+}
