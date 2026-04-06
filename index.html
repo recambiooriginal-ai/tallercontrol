@@ -489,8 +489,8 @@ function supa(path, opts){
   }, opts)).then(function(r){return r.json();});
 }
 function supaGet(table, select){
-  var order = table==='usuarios' ? 'key' : 'created_at.desc';
-  return supa(table+'?select='+(select||'*')+'&order='+order);
+  return supa(table+'?select='+(select||'*'));
+}
 }
 }
 }
