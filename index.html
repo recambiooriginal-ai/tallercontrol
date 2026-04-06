@@ -501,13 +501,7 @@ function supaUpdate(table, id, data){
 // ═══════════════════════════════════
 // DATOS EN MEMORIA
 // ═══════════════════════════════════
-var USUARIOS = {
-  admin:  {pass:'admin123', rol:'admin',    nombre:'Administrador', esp:'', coste:0},
-  carlos: {pass:'carlos123',rol:'mecanico', nombre:'Carlos M.',     esp:'Mecánica, suspensión', coste:25},
-  paco:   {pass:'paco123',  rol:'mecanico', nombre:'Paco R.',       esp:'Diagnóstico electrónico', coste:25},
-  luis:   {pass:'luis123',  rol:'mecanico', nombre:'Luis T.',       esp:'Motor, distribución', coste:25},
-  ana:    {pass:'ana123',   rol:'mecanico', nombre:'Ana V.',        esp:'Chapa y pintura', coste:25},
-};
+var USUARIOS = {};
 var ESTADOS = ['recepcion','diagnostico','reparacion','revision','entrega','completado'];
 var EL = {recepcion:'Recepción',diagnostico:'Diagnóstico',reparacion:'Reparación',revision:'Revisión',entrega:'Entrega',completado:'Completado'};
 var EN = {recepcion:'diagnostico',diagnostico:'reparacion',reparacion:'revision',revision:'entrega',entrega:'completado'};
@@ -554,7 +548,8 @@ function cargarDatos(){
   return Promise.all([
     supaGet('trabajos'),
     supaGet('horas'),
-    supaGet('notas')
+    supaGet('notas'),
+    supaGet('usuarios')
   ]).then(function(res){
     trabajos = Array.isArray(res[0]) ? res[0] : [];
     var hs = Array.isArray(res[1]) ? res[1] : [];
@@ -564,6 +559,10 @@ function cargarDatos(){
       horasMap[h.trabajo_id].push(h);
     });
     notas = Array.isArray(res[2]) ? res[2] : [];
+    var us = Array.isArray(res[3]) ? res[3] : [];
+    USUARIOS = {};
+    us.forEach(function(u){ USUARIOS[u.key] = u; });
+    actualizarSelectMecanicos();
     setLoading(false);
   }).catch(function(){
     setLoading(false);
@@ -1067,19 +1066,30 @@ function guardarUsuario(){
   var editKey=document.getElementById('u-edit-key').value;
   if(!nombre||!user){showToast('Rellena nombre y usuario');return;}
   if(!editKey && !pass){showToast('La contraseña es obligatoria para nuevo mecánico');return;}
+  var btn=document.querySelector('#modal-usuario .btn-p');
+  btn.textContent='Guardando...';btn.disabled=true;
   if(editKey){
-    USUARIOS[editKey].nombre=nombre;
-    USUARIOS[editKey].esp=esp;
-    USUARIOS[editKey].coste=coste;
-    if(pass) USUARIOS[editKey].pass=pass;
+    var datos={nombre:nombre,esp:esp,coste:coste};
+    if(pass) datos.pass=pass;
+    supa('usuarios?key=eq.'+editKey,{method:'PATCH',body:JSON.stringify(datos)}).then(function(){
+      Object.assign(USUARIOS[editKey],datos);
+      finalizarGuardarUsuario(editKey,btn);
+    });
   } else {
-    if(USUARIOS[user]){showToast('Ese usuario ya existe');return;}
-    USUARIOS[user]={pass:pass,rol:'mecanico',nombre:nombre,esp:esp,coste:coste};
+    if(USUARIOS[user]){showToast('Ese usuario ya existe');btn.textContent='Guardar mecánico';btn.disabled=false;return;}
+    var nuevo={key:user,pass:pass,rol:'mecanico',nombre:nombre,esp:esp,coste:coste};
+    supaInsert('usuarios',nuevo).then(function(){
+      USUARIOS[user]=nuevo;
+      finalizarGuardarUsuario('',btn);
+    });
   }
+}
+function finalizarGuardarUsuario(editKey,btn){
   document.getElementById('u-user').disabled=false;
   document.getElementById('u-edit-key').value='';
   document.getElementById('modal-usuario-title').textContent='Nuevo mecánico';
   ['u-nombre','u-user','u-pass','u-esp','u-coste'].forEach(function(id){document.getElementById(id).value='';});
+  btn.textContent='Guardar mecánico';btn.disabled=false;
   closeModal('modal-usuario');
   showToast(editKey?'Mecánico actualizado ✓':'Mecánico creado ✓');
   deskRenderMecanicos();
@@ -1100,10 +1110,18 @@ function cambiarPassword(){
   var p2=document.getElementById('cp-pass2').value;
   if(!p1){showToast('Escribe la nueva contraseña');return;}
   if(p1!==p2){showToast('Las contraseñas no coinciden');return;}
-  if(p1.length<6){showToast('La contraseña debe tener al menos 6 caracteres');return;}
-  USUARIOS[key].pass=p1;
-  closeModal('modal-cambiar-pass');
-  showToast('Contraseña cambiada ✓');
+  if(p1.length<6){showToast('Mínimo 6 caracteres');return;}
+  var btn=document.querySelector('#modal-cambiar-pass .btn-p');
+  btn.textContent='Guardando...';btn.disabled=true;
+  supa('usuarios?key=eq.'+key,{method:'PATCH',body:JSON.stringify({pass:p1})}).then(function(){
+    USUARIOS[key].pass=p1;
+    btn.textContent='Cambiar contraseña';btn.disabled=false;
+    closeModal('modal-cambiar-pass');
+    showToast('Contraseña cambiada ✓');
+  }).catch(function(){
+    btn.textContent='Cambiar contraseña';btn.disabled=false;
+    showToast('Error al guardar');
+  });
 }
 
 function actualizarSelectMecanicos(){
@@ -1176,7 +1194,6 @@ function simularFoto(){document.getElementById('img-upload-text').textContent='�
 
 // INICIO — ocultar loading
 setLoading(false);
-actualizarSelectMecanicos();
 </script>
 </body>
 </html>
