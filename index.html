@@ -1,7 +1,16 @@
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+bash
+
+cat /home/claude/taller_work.html
+Salida
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>TallerControl</title>
-<style>*{box-sizing:border-box;margin:0;padding:0;}
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:#f5f5f3;color:#1a1a1a;font-size:14px;-webkit-tap-highlight-color:transparent;}
 :root{
   --bg:#ffffff;--bg2:#f5f5f3;--bg3:#ebebea;
@@ -18,15 +27,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-s
 input,select,textarea,button{font-family:inherit;}
 button{cursor:pointer;}
 .screen{display:none;}.screen.active{display:block;}
+
 /* LOADING */
 .loading-screen{position:fixed;inset:0;background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px;}
 .loading-logo{font-size:28px;font-weight:600;}
 .loading-sub{font-size:14px;color:var(--text2);}
 .spinner{width:32px;height:32px;border:3px solid var(--border2);border-top-color:var(--text);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
+
 /* TOAST */
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 20px;border-radius:20px;font-size:13px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;}
+
 /* BADGES */
 .badge{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500;white-space:nowrap;display:inline-block;}
 .b-recepcion{background:var(--blue-bg);color:var(--blue-text);}
@@ -36,6 +48,7 @@ button{cursor:pointer;}
 .b-entrega{background:var(--green-bg);color:var(--green-text);}
 .b-completado{background:var(--gray-bg);color:var(--gray-text);}
 .b-urgente{background:var(--red-bg);color:var(--red-text);}
+
 /* LOGIN */
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg2);padding:16px;}
 .login-box{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:32px 28px;width:100%;max-width:360px;}
@@ -53,6 +66,7 @@ button{cursor:pointer;}
 .pills{display:flex;flex-wrap:wrap;gap:6px;}
 .pill{font-size:12px;padding:6px 12px;border-radius:20px;border:1px solid var(--border);cursor:pointer;color:var(--text2);background:var(--bg2);}
 .pill:hover{border-color:var(--border2);color:var(--text);}
+
 /* MODALES */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-end;justify-content:center;}
 .modal-overlay.open{display:flex;}
@@ -73,6 +87,7 @@ button{cursor:pointer;}
 .btn-p{padding:12px 20px;background:var(--text);color:var(--bg);border:none;border-radius:9px;font-size:14px;font-weight:500;flex:1;}
 .btn-s{padding:12px 20px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:9px;font-size:14px;}
 .locked-box{background:var(--amber-bg);border:1px solid #FAC775;border-radius:10px;padding:14px;font-size:13px;color:var(--amber-text);margin-bottom:16px;}
+
 /* ═══ MÓVIL ═══ */
 #mobile-app{display:none;}
 .mob-topbar{background:var(--bg);border-bottom:1px solid var(--border);padding:14px 16px 10px;position:sticky;top:0;z-index:10;}
@@ -151,6 +166,7 @@ button{cursor:pointer;}
 .mob-step-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;margin-top:2px;}
 .mob-step-line{width:1px;height:18px;background:var(--border);margin-left:5px;}
 .mob-avanzar{width:100%;padding:12px;background:var(--text);color:var(--bg);border:none;border-radius:9px;font-size:14px;font-weight:500;margin-top:10px;}
+
 /* ═══ ESCRITORIO ═══ */
 #desktop-app{display:none;}
 .desk-layout{display:flex;min-height:100vh;}
@@ -215,339 +231,258 @@ tbody tr:hover td{background:var(--bg2);}
 .desk-step-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;margin-top:2px;}
 .desk-step-line{width:1px;height:16px;background:var(--border);margin-left:5px;}
 .desk-avanzar{width:100%;padding:10px;background:var(--text);color:var(--bg);border:none;border-radius:8px;font-size:13px;font-weight:500;margin-top:12px;cursor:pointer;}
-.empty-state{text-align:center;padding:40px 20px;color:var(--text2);font-size:14px;}</style>
+.empty-state{text-align:center;padding:40px 20px;color:var(--text2);font-size:14px;}
+</style>
+</head>
+<body>
+
 <!-- LOADING -->
 <div class="loading-screen" id="loading-screen">
   <div class="loading-logo">🔧 TallerControl</div>
   <div class="spinner"></div>
   <div class="loading-sub" id="loading-msg">Conectando...</div>
 </div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
 <!-- LOGIN -->
 <div class="screen active" id="screen-login">
-  <div class="login-wrap">
-    <div class="login-box">
-      <div class="login-logo">🔧 TallerControl</div>
-      <div class="login-tagline">Panel de gestión — acceso seguro</div>
-      <div class="fl">
-        <div class="fgroup">
-          <label>Usuario</label>
-          <input id="l-user" placeholder="tu usuario" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
-        </div>
-        <div class="fgroup">
-          <label>Contraseña</label>
-          <input id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-        </div>
-        <button class="btn-login" onclick="doLogin()">Entrar</button>
-        <div class="err-msg" id="err-msg">Usuario o contraseña incorrectos.</div>
-      </div>
-      <div class="login-hints">
-        <div class="hint-title">Acceso rápido (demo)</div>
-        <div class="pills">
-          <span class="pill" onclick="quickLogin('admin','admin123')">admin</span>
-          <span class="pill" onclick="quickLogin('carlos','carlos123')">carlos</span>
-          <span class="pill" onclick="quickLogin('paco','paco123')">paco</span>
-          <span class="pill" onclick="quickLogin('luis','luis123')">luis</span>
-          <span class="pill" onclick="quickLogin('ana','ana123')">ana</span>
-        </div>
-      </div>
+<div class="login-wrap">
+<div class="login-box">
+  <div class="login-logo">🔧 TallerControl</div>
+  <div class="login-tagline">Panel de gestión — acceso seguro</div>
+  <div class="fl">
+    <div class="fgroup"><label>Usuario</label>
+      <input id="l-user" placeholder="tu usuario" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div class="fgroup"><label>Contraseña</label>
+      <input id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <button class="btn-login" onclick="doLogin()">Entrar</button>
+    <div class="err-msg" id="err-msg">Usuario o contraseña incorrectos.</div>
+  </div>
+  <div class="login-hints">
+    <div class="hint-title">Acceso rápido (demo)</div>
+    <div class="pills">
+      <span class="pill" onclick="quickLogin('admin','admin123')">admin</span>
+      <span class="pill" onclick="quickLogin('carlos','carlos123')">carlos</span>
+      <span class="pill" onclick="quickLogin('paco','paco123')">paco</span>
+      <span class="pill" onclick="quickLogin('luis','luis123')">luis</span>
+      <span class="pill" onclick="quickLogin('ana','ana123')">ana</span>
     </div>
   </div>
 </div>
+</div>
+</div>
+
 <!-- MAIN -->
-<div class="screen" id="screen-main"><!-- MÓVIL -->
-  <div id="mobile-app">
-    <div class="mob-topbar">
-      <div class="mob-topbar-title">🔧 TallerControl</div>
-      <div class="mob-topbar-sub" id="mob-sub">—</div>
-    </div>
-    <div class="mob-nav">
-      <button class="mob-nav-btn active" onclick="mobShowPage('inicio')" id="mnav-inicio">
-        <span class="mob-nav-icon">🏠</span>Inicio
-      </button>
-      <button class="mob-nav-btn" onclick="mobShowPage('trabajos')" id="mnav-trabajos">
-        <span class="mob-nav-icon">🔧</span>Trabajos
-      </button>
-      <button class="mob-nav-btn" onclick="mobShowPage('proceso')" id="mnav-proceso">
-        <span class="mob-nav-icon">📋</span>Proceso
-      </button>
-      <button class="mob-nav-btn" onclick="mobShowPage('horas')" id="mnav-horas">
-        <span class="mob-nav-icon">⏱</span>Horas
-      </button>
-      <button class="mob-nav-btn" onclick="mobShowPage('notas')" id="mnav-notas">
-        <span class="mob-nav-icon">📝</span>Notas
-      </button>
-    </div>
-    <div class="mob-content">
-      <div class="mob-page active" id="mob-page-inicio"></div>
-      <div class="mob-page" id="mob-page-trabajos"></div>
-      <div class="mob-page" id="mob-page-proceso"></div>
-      <div class="mob-page" id="mob-page-horas"></div>
-      <div class="mob-page" id="mob-page-notas"></div>
-    </div>
-    <button class="mob-fab" onclick="openModal('modal-nuevo')">+</button>
+<div class="screen" id="screen-main">
+
+<!-- MÓVIL -->
+<div id="mobile-app">
+  <div class="mob-topbar">
+    <div class="mob-topbar-title">🔧 TallerControl</div>
+    <div class="mob-topbar-sub" id="mob-sub">—</div>
   </div>
+  <div class="mob-nav">
+    <button class="mob-nav-btn active" onclick="mobShowPage('inicio')" id="mnav-inicio"><span class="mob-nav-icon">🏠</span>Inicio</button>
+    <button class="mob-nav-btn" onclick="mobShowPage('trabajos')" id="mnav-trabajos"><span class="mob-nav-icon">🔧</span>Trabajos</button>
+    <button class="mob-nav-btn" onclick="mobShowPage('proceso')" id="mnav-proceso"><span class="mob-nav-icon">📋</span>Proceso</button>
+    <button class="mob-nav-btn" onclick="mobShowPage('horas')" id="mnav-horas"><span class="mob-nav-icon">⏱</span>Horas</button>
+    <button class="mob-nav-btn" onclick="mobShowPage('notas')" id="mnav-notas"><span class="mob-nav-icon">📝</span>Notas</button>
+  </div>
+  <div class="mob-content">
+    <div class="mob-page active" id="mob-page-inicio"></div>
+    <div class="mob-page" id="mob-page-trabajos"></div>
+    <div class="mob-page" id="mob-page-proceso"></div>
+    <div class="mob-page" id="mob-page-horas"></div>
+    <div class="mob-page" id="mob-page-notas"></div>
+  </div>
+  <button class="mob-fab" onclick="openModal('modal-nuevo')">+</button>
+</div>
+
 <!-- ESCRITORIO -->
-  <div id="desktop-app">
-    <div class="desk-layout">
-      <div class="desk-sidebar">
-        <div class="desk-sb-head">
-          <div class="desk-sb-logo">🔧 TallerControl</div>
-          <div class="desk-sb-user" id="desk-username">—</div>
-          <div class="desk-sb-role" id="desk-role-badge">—</div>
-        </div>
-        <div class="desk-sb-nav" id="desk-sb-nav"></div>
-        <div class="desk-sb-footer">
-          <button class="desk-logout" onclick="doLogout()">← Cerrar sesión</button>
-        </div>
+<div id="desktop-app">
+<div class="desk-layout">
+  <div class="desk-sidebar">
+    <div class="desk-sb-head">
+      <div class="desk-sb-logo">🔧 TallerControl</div>
+      <div class="desk-sb-user" id="desk-username">—</div>
+      <div class="desk-sb-role" id="desk-role-badge">—</div>
+    </div>
+    <div class="desk-sb-nav" id="desk-sb-nav"></div>
+    <div class="desk-sb-footer">
+      <button class="desk-logout" onclick="doLogout()">← Cerrar sesión</button>
+    </div>
+  </div>
+  <div class="desk-content">
+    <div class="desk-page active" id="desk-page-dashboard">
+      <div class="desk-page-header">
+        <div class="desk-page-title" id="desk-dash-title">Panel general</div>
+        <button class="desk-btn-add" onclick="openModal('modal-nuevo')">+ Nuevo trabajo</button>
       </div>
-      <div class="desk-content">
-        <div class="desk-page active" id="desk-page-dashboard">
-          <div class="desk-page-header">
-            <div class="desk-page-title" id="desk-dash-title">Panel general</div>
-            <button class="desk-btn-add" onclick="openModal('modal-nuevo')">+ Nuevo trabajo</button>
-          </div>
-          <div class="desk-metrics" id="desk-metrics"></div>
-          <div class="desk-two">
-            <div class="desk-card">
-              <div class="desk-card-title">Trabajos en curso</div>
-              <div class="tbl-wrap">
-                <table id="desk-tbl-dash">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Matrícula</th>
-                      <th>Vehículo</th>
-                      <th>Estado</th>
-                      <th>Mecánico</th>
-                      <th>Horas</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-              </div>
-            </div>
-            <div class="desk-card">
-              <div class="desk-card-title">Proceso</div>
-              <div class="desk-kanban-wrap" id="desk-kanban-dash"></div>
-            </div>
-          </div>
+      <div class="desk-metrics" id="desk-metrics"></div>
+      <div class="desk-two">
+        <div class="desk-card">
+          <div class="desk-card-title">Trabajos en curso</div>
+          <div class="tbl-wrap"><table id="desk-tbl-dash"><thead><tr><th>ID</th><th>Matrícula</th><th>Vehículo</th><th>Estado</th><th>Mecánico</th><th>Horas</th><th></th></tr></thead><tbody></tbody></table></div>
         </div>
-        <div class="desk-page" id="desk-page-trabajos">
-          <div class="desk-page-header">
-            <div class="desk-page-title">Gestión de trabajos</div>
-            <button class="desk-btn-add" onclick="openModal('modal-nuevo')">+ Nuevo trabajo</button>
-          </div>
-          <div class="search-bar">
-            <input id="desk-search" placeholder="Buscar matrícula, vehículo, cliente..." oninput="deskRenderTrabajos()">
-            <select class="filter-sel" id="desk-filter" onchange="deskRenderTrabajos()">
-              <option value="">Todos los estados</option>
-              <option value="recepcion">Recepción</option>
-              <option value="diagnostico">Diagnóstico</option>
-              <option value="reparacion">Reparación</option>
-              <option value="revision">Revisión</option>
-              <option value="entrega">Entrega</option>
-              <option value="completado">Completado</option>
-            </select>
-          </div>
-          <div class="desk-card">
-            <div class="tbl-wrap">
-              <table id="desk-tbl-trab">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Matrícula</th>
-                    <th>Vehículo</th>
-                    <th>Cliente</th>
-                    <th>Trabajo</th>
-                    <th>Estado</th>
-                    <th>Mecánico</th>
-                    <th>Horas</th>
-                    <th>Urgente</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        <div class="desk-page" id="desk-page-kanban">
-          <div class="desk-page-header">
-            <div class="desk-page-title">Proceso de trabajos</div>
-          </div>
-          <div class="desk-card">
-            <div class="desk-kanban-wrap" id="desk-kanban-full"></div>
-          </div>
-        </div>
-        <div class="desk-page" id="desk-page-horas">
-          <div class="desk-page-header">
-            <div class="desk-page-title">Control de horas</div>
-          </div>
-          <div id="desk-horas-content"></div>
-        </div>
-        <div class="desk-page" id="desk-page-facturacion">
-          <div class="desk-page-header">
-            <div class="desk-page-title">Facturación</div>
-          </div>
-          <div id="desk-fac-content"></div>
-        </div>
-        <div class="desk-page" id="desk-page-notas">
-          <div class="desk-page-header">
-            <div class="desk-page-title">Notas y presupuestos</div>
-            <button class="desk-btn-add" onclick="openModal('modal-nuevo-nota')">+ Nueva nota</button>
-          </div>
-          <div id="desk-notas-content"></div>
-        </div>
-        <div class="desk-page" id="desk-page-mecanicos">
-          <div class="desk-page-header">
-            <div class="desk-page-title">Mecánicos</div>
-          </div>
-          <div class="desk-card">
-            <div class="tbl-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Usuario</th>
-                    <th>Especialidad</th>
-                    <th>Activos</th>
-                    <th>Horas</th>
-                    <th>Facturado</th>
-                  </tr>
-                </thead>
-                <tbody id="desk-tbl-mec"></tbody>
-              </table>
-            </div>
-          </div>
+        <div class="desk-card">
+          <div class="desk-card-title">Proceso</div>
+          <div class="desk-kanban-wrap" id="desk-kanban-dash"></div>
         </div>
       </div>
     </div>
-    <div class="desk-modal-overlay" id="desk-modal-detalle" onclick="if(event.target===this)closeDesktopDetalle()">
-      <div class="desk-modal" id="desk-detalle-content"></div>
+    <div class="desk-page" id="desk-page-trabajos">
+      <div class="desk-page-header">
+        <div class="desk-page-title">Gestión de trabajos</div>
+        <button class="desk-btn-add" onclick="openModal('modal-nuevo')">+ Nuevo trabajo</button>
+      </div>
+      <div class="search-bar">
+        <input id="desk-search" placeholder="Buscar matrícula, vehículo, cliente..." oninput="deskRenderTrabajos()"/>
+        <select class="filter-sel" id="desk-filter" onchange="deskRenderTrabajos()">
+          <option value="">Todos los estados</option>
+          <option value="recepcion">Recepción</option>
+          <option value="diagnostico">Diagnóstico</option>
+          <option value="reparacion">Reparación</option>
+          <option value="revision">Revisión</option>
+          <option value="entrega">Entrega</option>
+          <option value="completado">Completado</option>
+        </select>
+      </div>
+      <div class="desk-card">
+        <div class="tbl-wrap"><table id="desk-tbl-trab"><thead><tr><th>ID</th><th>Matrícula</th><th>Vehículo</th><th>Cliente</th><th>Trabajo</th><th>Estado</th><th>Mecánico</th><th>Horas</th><th>Urgente</th><th>Acciones</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </div>
+    <div class="desk-page" id="desk-page-kanban">
+      <div class="desk-page-header"><div class="desk-page-title">Proceso de trabajos</div></div>
+      <div class="desk-card"><div class="desk-kanban-wrap" id="desk-kanban-full"></div></div>
+    </div>
+    <div class="desk-page" id="desk-page-horas">
+      <div class="desk-page-header"><div class="desk-page-title">Control de horas</div></div>
+      <div id="desk-horas-content"></div>
+    </div>
+    <div class="desk-page" id="desk-page-facturacion">
+      <div class="desk-page-header"><div class="desk-page-title">Facturación</div></div>
+      <div id="desk-fac-content"></div>
+    </div>
+    <div class="desk-page" id="desk-page-notas">
+      <div class="desk-page-header">
+        <div class="desk-page-title">Notas y presupuestos</div>
+        <button class="desk-btn-add" onclick="openModal('modal-nuevo-nota')">+ Nueva nota</button>
+      </div>
+      <div id="desk-notas-content"></div>
+    </div>
+    <div class="desk-page" id="desk-page-mecanicos">
+      <div class="desk-page-header">
+        <div class="desk-page-title">Mecánicos</div>
+        <button class="desk-btn-add" onclick="openModal('modal-usuario')">+ Nuevo mecánico</button>
+      </div>
+      <div class="desk-card"><div class="tbl-wrap"><table><thead><tr><th>Nombre</th><th>Usuario</th><th>Especialidad</th><th>€/hora</th><th>Activos</th><th>Horas</th><th>Coste M.O.</th><th>Facturado</th><th>Acciones</th></tr></thead><tbody id="desk-tbl-mec"></tbody></table></div></div>
     </div>
   </div>
 </div>
+<div class="desk-modal-overlay" id="desk-modal-detalle" onclick="if(event.target===this)closeDesktopDetalle()">
+  <div class="desk-modal" id="desk-detalle-content"></div>
+</div>
+</div>
+</div>
+
 <!-- MODALES COMPARTIDOS -->
 <div class="modal-overlay" id="modal-nuevo">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-nuevo')">×</button>
-    <div class="modal-title">Nuevo trabajo</div>
-    <div class="fg-row">
-      <div class="fg">
-        <label>Matrícula *</label>
-        <input id="nw-mat" placeholder="1234 ABC" style="text-transform:uppercase">
-      </div>
-      <div class="fg">
-        <label>Vehículo *</label>
-        <input id="nw-veh" placeholder="Marca y modelo">
-      </div>
+<div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-nuevo')">×</button>
+  <div class="modal-title">Nuevo trabajo</div>
+  <div class="fg-row">
+    <div class="fg"><label>Matrícula *</label><input id="nw-mat" placeholder="1234 ABC" style="text-transform:uppercase"/></div>
+    <div class="fg"><label>Vehículo *</label><input id="nw-veh" placeholder="Marca y modelo"/></div>
+  </div>
+  <div class="fg-row">
+    <div class="fg"><label>Cliente</label><input id="nw-cliente" placeholder="Nombre y apellidos"/></div>
+    <div class="fg"><label>Teléfono</label><input id="nw-tel" placeholder="600 000 000"/></div>
+  </div>
+  <div class="fg-row">
+    <div class="fg"><label>Tipo de trabajo</label>
+      <select id="nw-tipo"><option>Revisión general</option><option>Cambio de frenos</option><option>Cambio de aceite</option><option>Suspensión</option><option>Motor</option><option>Diagnóstico electrónico</option><option>Chapa y pintura</option><option>Escape</option><option>Aire acondicionado</option><option>Electricidad</option><option>Otro</option></select>
     </div>
-    <div class="fg-row">
-      <div class="fg">
-        <label>Cliente</label>
-        <input id="nw-cliente" placeholder="Nombre y apellidos">
-      </div>
-      <div class="fg">
-        <label>Teléfono</label>
-        <input id="nw-tel" placeholder="600 000 000">
-      </div>
-    </div>
-    <div class="fg-row">
-      <div class="fg">
-        <label>Tipo de trabajo</label>
-        <select id="nw-tipo">
-          <option>Revisión general</option>
-          <option>Cambio de frenos</option>
-          <option>Cambio de aceite</option>
-          <option>Suspensión</option>
-          <option>Motor</option>
-          <option>Diagnóstico electrónico</option>
-          <option>Chapa y pintura</option>
-          <option>Escape</option>
-          <option>Aire acondicionado</option>
-          <option>Electricidad</option>
-          <option>Otro</option>
-        </select>
-      </div>
-      <div class="fg">
-        <label>Mecánico</label>
-        <select id="nw-mec">
-          <option>Carlos M.</option>
-          <option>Paco R.</option>
-          <option>Luis T.</option>
-          <option>Ana V.</option>
-        </select>
-      </div>
-    </div>
-    <div class="fg-row">
-      <div class="fg">
-        <label>Precio estimado (€)</label>
-        <input id="nw-precio" type="number" min="0" placeholder="0">
-      </div>
-      <div class="fg">
-        <label>¿Urgente?</label>
-        <select id="nw-urg">
-          <option value="no">No</option>
-          <option value="si">Sí</option>
-        </select>
-      </div>
-    </div>
-    <div class="fg">
-      <label>Observaciones</label>
-      <textarea id="nw-obs" placeholder="Descripción del problema..."></textarea>
-    </div>
-    <div class="btn-row">
-      <button class="btn-p" id="btn-crear-trabajo" onclick="crearTrabajo()">Crear trabajo</button>
-      <button class="btn-s" onclick="closeModal('modal-nuevo')">Cancelar</button>
+    <div class="fg"><label>Mecánico</label>
+      <select id="nw-mec"></select>
     </div>
   </div>
+  <div class="fg-row">
+    <div class="fg"><label>Precio estimado (€)</label><input id="nw-precio" type="number" min="0" placeholder="0"/></div>
+    <div class="fg"><label>¿Urgente?</label><select id="nw-urg"><option value="no">No</option><option value="si">Sí</option></select></div>
+  </div>
+  <div class="fg"><label>Observaciones</label><textarea id="nw-obs" placeholder="Descripción del problema..."></textarea></div>
+  <div class="btn-row">
+    <button class="btn-p" id="btn-crear-trabajo" onclick="crearTrabajo()">Crear trabajo</button>
+    <button class="btn-s" onclick="closeModal('modal-nuevo')">Cancelar</button>
+  </div>
 </div>
+</div>
+
 <div class="modal-overlay" id="modal-nuevo-nota">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-nuevo-nota')">×</button>
-    <div class="modal-title">Nueva nota / presupuesto</div>
-    <div class="fg">
-      <label>Trabajo relacionado</label>
-      <select id="nota-job"></select>
+<div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-nuevo-nota')">×</button>
+  <div class="modal-title">Nueva nota / presupuesto</div>
+  <div class="fg"><label>Trabajo relacionado</label><select id="nota-job"></select></div>
+  <div class="fg"><label>Tipo</label>
+    <div class="chip-row">
+      <span class="chip sel" data-v="pendiente" onclick="selChip(this,'nota-tipo')">Parte pendiente</span>
+      <span class="chip" data-v="presupuesto" onclick="selChip(this,'nota-tipo')">Presupuesto</span>
+      <span class="chip" data-v="foto" onclick="selChip(this,'nota-tipo')">Fotografía</span>
     </div>
-    <div class="fg">
-      <label>Tipo</label>
-      <div class="chip-row">
-        <span class="chip sel" data-v="pendiente" onclick="selChip(this,'nota-tipo')">Parte pendiente</span>
-        <span class="chip" data-v="presupuesto" onclick="selChip(this,'nota-tipo')">Presupuesto</span>
-        <span class="chip" data-v="foto" onclick="selChip(this,'nota-tipo')">Fotografía</span>
-      </div>
-      <input type="hidden" id="nota-tipo" value="pendiente">
-    </div>
-    <div class="fg">
-      <label>Descripción *</label>
-      <textarea id="nota-texto" placeholder="Describe la nota..."></textarea>
-    </div>
-    <div class="fg" id="nota-precio-wrap" style="display:none">
-      <label>Importe (€)</label>
-      <input id="nota-precio" type="number" min="0" placeholder="0">
-    </div>
-    <div class="img-upload-area" id="nota-img-wrap" style="display:none" onclick="simularFoto()">
-      <div id="img-upload-text">📷 Haz clic para adjuntar fotografía</div>
-      <div style="font-size:11px;margin-top:5px;color:var(--text3)">JPG, PNG</div>
-    </div>
-    <div class="btn-row" style="margin-top:16px;">
-      <button class="btn-p" id="btn-crear-nota" onclick="crearNota()">Guardar</button>
-      <button class="btn-s" onclick="closeModal('modal-nuevo-nota')">Cancelar</button>
-    </div>
+    <input type="hidden" id="nota-tipo" value="pendiente"/>
+  </div>
+  <div class="fg"><label>Descripción *</label><textarea id="nota-texto" placeholder="Describe la nota..."></textarea></div>
+  <div class="fg" id="nota-precio-wrap" style="display:none"><label>Importe (€)</label><input id="nota-precio" type="number" min="0" placeholder="0"/></div>
+  <div class="img-upload-area" id="nota-img-wrap" style="display:none" onclick="simularFoto()">
+    <div id="img-upload-text">📷 Haz clic para adjuntar fotografía</div>
+    <div style="font-size:11px;margin-top:5px;color:var(--text3)">JPG, PNG</div>
+  </div>
+  <div class="btn-row" style="margin-top:16px;">
+    <button class="btn-p" id="btn-crear-nota" onclick="crearNota()">Guardar</button>
+    <button class="btn-s" onclick="closeModal('modal-nuevo-nota')">Cancelar</button>
   </div>
 </div>
+</div>
+
 <div class="mob-detalle-overlay" id="mob-detalle-overlay">
   <div class="mob-detalle-inner" id="mob-detalle-content"></div>
 </div>
-<script>// ═══════════════════════════════════
+
+<div class="modal-overlay" id="modal-usuario">
+<div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-usuario')">×</button>
+  <div class="modal-title" id="modal-usuario-title">Nuevo mecánico</div>
+  <div class="fg"><label>Nombre completo *</label><input id="u-nombre" placeholder="Ej: Juan García"/></div>
+  <div class="fg-row"><div class="fg"><label>Usuario (login) *</label><input id="u-user" placeholder="Ej: juan"/></div><div class="fg"><label>Contraseña *</label><input id="u-pass" type="password" placeholder="••••••••"/></div></div>
+  <div class="fg-row"><div class="fg"><label>Especialidad</label><input id="u-esp" placeholder="Ej: Motor, frenos..."/></div><div class="fg"><label>Coste mano de obra (€/hora)</label><input id="u-coste" type="number" min="0" placeholder="0"/></div></div>
+  <input type="hidden" id="u-edit-key"/>
+  <div class="btn-row"><button class="btn-p" onclick="guardarUsuario()">Guardar mecánico</button><button class="btn-s" onclick="closeModal('modal-usuario')">Cancelar</button></div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-cambiar-pass">
+<div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-cambiar-pass')">×</button>
+  <div class="modal-title">Cambiar contraseña</div>
+  <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Mecánico: <strong id="cp-nombre"></strong></div>
+  <div class="fg"><label>Nueva contraseña *</label><input id="cp-pass" type="password" placeholder="Nueva contraseña"/></div>
+  <div class="fg"><label>Repetir contraseña *</label><input id="cp-pass2" type="password" placeholder="Repite la contraseña"/></div>
+  <input type="hidden" id="cp-key"/>
+  <div class="btn-row"><button class="btn-p" onclick="cambiarPassword()">Cambiar contraseña</button><button class="btn-s" onclick="closeModal('modal-cambiar-pass')">Cancelar</button></div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════
 // SUPABASE CONFIG
 // ═══════════════════════════════════
 var SUPA_URL = 'https://alaqsdclibfczlmwvvax.supabase.co';
 var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsYXFzZGNsaWJmY3psbXd2dmF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MTAxNjQsImV4cCI6MjA5MDk4NjE2NH0.4A58MaONBV9ee_0QnVyWpMD1yceFqQDuALy4c3LQ01k';
+
 function supa(path, opts){
   return fetch(SUPA_URL+'/rest/v1/'+path, Object.assign({
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'}
@@ -562,25 +497,28 @@ function supaInsert(table, data){
 function supaUpdate(table, id, data){
   return supa(table+'?id=eq.'+id, {method:'PATCH', body:JSON.stringify(data)});
 }
+
 // ═══════════════════════════════════
 // DATOS EN MEMORIA
 // ═══════════════════════════════════
 var USUARIOS = {
-  admin:  {pass:'admin123', rol:'admin',    nombre:'Administrador'},
-  carlos: {pass:'carlos123',rol:'mecanico', nombre:'Carlos M.'},
-  paco:   {pass:'paco123',  rol:'mecanico', nombre:'Paco R.'},
-  luis:   {pass:'luis123',  rol:'mecanico', nombre:'Luis T.'},
-  ana:    {pass:'ana123',   rol:'mecanico', nombre:'Ana V.'},
+  admin:  {pass:'admin123', rol:'admin',    nombre:'Administrador', esp:'', coste:0},
+  carlos: {pass:'carlos123',rol:'mecanico', nombre:'Carlos M.',     esp:'Mecánica, suspensión', coste:25},
+  paco:   {pass:'paco123',  rol:'mecanico', nombre:'Paco R.',       esp:'Diagnóstico electrónico', coste:25},
+  luis:   {pass:'luis123',  rol:'mecanico', nombre:'Luis T.',       esp:'Motor, distribución', coste:25},
+  ana:    {pass:'ana123',   rol:'mecanico', nombre:'Ana V.',        esp:'Chapa y pintura', coste:25},
 };
 var ESTADOS = ['recepcion','diagnostico','reparacion','revision','entrega','completado'];
 var EL = {recepcion:'Recepción',diagnostico:'Diagnóstico',reparacion:'Reparación',revision:'Revisión',entrega:'Entrega',completado:'Completado'};
 var EN = {recepcion:'diagnostico',diagnostico:'reparacion',reparacion:'revision',revision:'entrega',entrega:'completado'};
+
 var sesion = null;
 var isMobile = window.innerWidth < 768;
 var trabajos = [];
 var horasMap = {};
 var notas = [];
 var activeTimers = {};
+
 // ═══════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════
@@ -607,6 +545,7 @@ function setLoading(msg){
   if(msg){ls.style.display='flex';document.getElementById('loading-msg').textContent=msg;}
   else{ls.style.display='none';}
 }
+
 // ═══════════════════════════════════
 // CARGAR DATOS DESDE SUPABASE
 // ═══════════════════════════════════
@@ -631,6 +570,7 @@ function cargarDatos(){
     showToast('Error al cargar datos');
   });
 }
+
 // ═══════════════════════════════════
 // LOGIN / LOGOUT
 // ═══════════════════════════════════
@@ -674,6 +614,7 @@ function doLogout(){
   document.getElementById('mobile-app').style.display='none';
   document.getElementById('desktop-app').style.display='none';
 }
+
 // ═══════════════════════════════════
 // CREAR TRABAJO
 // ═══════════════════════════════════
@@ -705,6 +646,7 @@ function crearTrabajo(){
     if(isMobile)mobShowPage('trabajos');else{deskRenderTrabajos();deskShowPage('trabajos');}
   }).catch(function(){btn.textContent='Crear trabajo';btn.disabled=false;showToast('Error al guardar');});
 }
+
 // ═══════════════════════════════════
 // AVANZAR ESTADO
 // ═══════════════════════════════════
@@ -720,6 +662,7 @@ function avanzar(id, callback){
     else deskRenderPage(document.querySelector('.desk-page.active').id.replace('desk-page-',''));
   }).catch(function(){showToast('Error al actualizar');});
 }
+
 // ═══════════════════════════════════
 // CREAR NOTA
 // ═══════════════════════════════════
@@ -746,6 +689,7 @@ function crearNota(){
     if(isMobile)mobRenderNotas();else deskRenderNotas();
   }).catch(function(){btn.textContent='Guardar';btn.disabled=false;showToast('Error al guardar');});
 }
+
 // ═══════════════════════════════════
 // CRONÓMETRO (guarda en Supabase)
 // ═══════════════════════════════════
@@ -754,15 +698,20 @@ function stopTimer(id){
   var st=activeTimers[id];if(!st)return;
   var mins=Math.max(1,Math.round((Date.now()-st)/60000));
   delete activeTimers[id];
-  var nuevaHora={trabajo_id:id, tipo:'Mano de obra', mins:mins, fecha:hoy()};
+  var t=trabajos.find(function(j){return j.id===id;});
+  var mecKey=Object.keys(USUARIOS).find(function(k){return USUARIOS[k].nombre===(t?t.mecanico:'');});
+  var costeHora=mecKey?(USUARIOS[mecKey].coste||0):0;
+  var coste=parseFloat(((mins/60)*costeHora).toFixed(2));
+  var nuevaHora={trabajo_id:id, tipo:'Mano de obra', mins:mins, fecha:hoy(), coste:coste};
   supaInsert('horas', nuevaHora).then(function(res){
     var h=res&&res[0]?res[0]:nuevaHora;
     if(!horasMap[id])horasMap[id]=[];
     horasMap[id].push(h);
-    showToast(mins+'m registrados ✓');
+    showToast(mins+'m registrados'+(coste>0?' — '+coste+'€':'')+' ✓');
     if(isMobile)mobRenderHoras();else deskRenderHoras();
   });
 }
+
 // ═══════════════════════════════════
 // MÓVIL — PÁGINAS
 // ═══════════════════════════════════
@@ -777,6 +726,7 @@ function mobShowPage(id){
   else if(id==='horas')mobRenderHoras();
   else if(id==='notas')mobRenderNotas();
 }
+
 function mobJobCard(t){
   return '<div class="mob-job'+(t.urgente?' urgent':'')+'" onclick="mobVerDetalle(\''+t.id+'\')">'+
     '<div class="mob-job-top">'+
@@ -793,6 +743,7 @@ function mobJobCard(t){
     '<div class="mob-job-footer"><span>'+t.mecanico+'</span><span>'+th(t)+'</span></div>'+
   '</div>';
 }
+
 function mobRenderInicio(){
   var ts=misTrab();
   var activos=ts.filter(function(t){return t.estado!=='completado';}).length;
@@ -815,12 +766,14 @@ function mobRenderInicio(){
   if(!ts.length)html+='<div class="empty-state">Sin trabajos registrados.<br>Pulsa + para añadir el primero.</div>';
   document.getElementById('mob-page-inicio').innerHTML=html;
 }
+
 function mobRenderTrabajos(){
   var ts=misTrab();
   document.getElementById('mob-page-trabajos').innerHTML=
     '<div class="mob-section-title">Todos los trabajos ('+ts.length+')</div>'+
     (ts.length?ts.map(mobJobCard).join(''):'<div class="empty-state">Sin trabajos.</div>');
 }
+
 function mobRenderProceso(){
   var ts=misTrab();
   var cols=ESTADOS.filter(function(e){return e!=='completado';});
@@ -842,6 +795,7 @@ function mobRenderProceso(){
   '</div></div>';
   document.getElementById('mob-page-proceso').innerHTML=html;
 }
+
 function mobRenderHoras(){
   var ts=misTrab();
   var html='';
@@ -863,6 +817,7 @@ function mobRenderHoras(){
   });
   document.getElementById('mob-page-horas').innerHTML=html||'<div class="empty-state">Sin trabajos.</div>';
 }
+
 function mobRenderNotas(){
   var ns=sesion.rol==='admin'?notas:notas.filter(function(n){return n.mec===sesion.nombre;});
   var typeL={pendiente:'Parte pendiente',presupuesto:'Presupuesto',foto:'Fotografía'};
@@ -881,6 +836,7 @@ function mobRenderNotas(){
   if(!ns.length)html+='<div class="empty-state">Sin notas registradas.</div>';
   document.getElementById('mob-page-notas').innerHTML=html;
 }
+
 function mobVerDetalle(id){
   var t=trabajos.find(function(j){return j.id===id;});if(!t)return;
   var si=ESTADOS.indexOf(t.estado);
@@ -918,11 +874,13 @@ function mobVerDetalle(id){
   document.getElementById('mob-detalle-overlay').classList.add('open');
 }
 function closeMobDetalle(){document.getElementById('mob-detalle-overlay').classList.remove('open');}
+
 // ═══════════════════════════════════
 // ESCRITORIO — NAVEGACIÓN
 // ═══════════════════════════════════
 var NAV_ADMIN=[{id:'dashboard',label:'Dashboard'},{id:'trabajos',label:'Trabajos'},{id:'kanban',label:'Proceso (Kanban)'},{id:'horas',label:'Control de horas'},{id:'facturacion',label:'Facturación'},{id:'notas',label:'Notas y presupuestos'},{id:'mecanicos',label:'Mecánicos'}];
 var NAV_MEC=[{id:'dashboard',label:'Mis trabajos'},{id:'kanban',label:'Proceso'},{id:'horas',label:'Mis horas'},{id:'notas',label:'Notas y presupuestos'}];
+
 function deskBuildSidebar(){
   var nav=sesion.rol==='admin'?NAV_ADMIN:NAV_MEC;
   document.getElementById('desk-sb-nav').innerHTML=nav.map(function(n){
@@ -945,6 +903,7 @@ function deskRenderPage(id){
   else if(id==='notas')deskRenderNotas();
   else if(id==='mecanicos')deskRenderMecanicos();
 }
+
 function deskRenderDashboard(){
   var ts=misTrab();
   var activos=ts.filter(function(t){return t.estado!=='completado';}).length;
@@ -963,6 +922,7 @@ function deskRenderDashboard(){
   }).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:20px">Sin trabajos activos</td></tr>';
   deskKanbanEl('desk-kanban-dash',act);
 }
+
 function deskRenderTrabajos(){
   var q=(document.getElementById('desk-search')||{value:''}).value.toLowerCase();
   var ef=(document.getElementById('desk-filter')||{value:''}).value;
@@ -975,6 +935,7 @@ function deskRenderTrabajos(){
       '<td><a class="act-link" onclick="deskVerDetalle(\''+t.id+'\')">Detalle</a>'+(EN[t.estado]?'<a class="act-link" onclick="avanzar(\''+t.id+'\',function(){deskRenderTrabajos()})">Avanzar →</a>':'')+'</td></tr>';
   }).join('')||'<tr><td colspan="10" style="text-align:center;color:var(--text2);padding:20px">Sin trabajos</td></tr>';
 }
+
 function deskKanbanEl(elId,ts){
   var cols=ESTADOS.filter(function(e){return e!=='completado';});
   document.getElementById(elId).innerHTML=cols.map(function(e){
@@ -988,23 +949,39 @@ function deskKanbanEl(elId,ts){
   }).join('');
 }
 function deskRenderKanbanFull(){deskKanbanEl('desk-kanban-full',misTrab());}
+
 function deskRenderHoras(){
   var ts=misTrab(),html='';
-  var header=sesion.rol==='admin'
-    ?'<th>Mecánico</th><th>Matrícula</th><th>Vehículo</th><th>Tarea</th><th>Horas</th><th>Fecha</th>'
+  var isAdmin=sesion.rol==='admin';
+  var header=isAdmin
+    ?'<th>Mecánico</th><th>Matrícula</th><th>Vehículo</th><th>Tarea</th><th>Horas</th><th>€/hora</th><th>Coste M.O.</th><th>Fecha</th>'
     :'<th>Matrícula</th><th>Vehículo</th><th>Tarea</th><th>Horas</th><th>Fecha</th>';
+  var totalMins=0, totalCoste=0;
   html='<div class="desk-card"><div class="tbl-wrap"><table><thead><tr>'+header+'</tr></thead><tbody>';
   var rows='';
   ts.forEach(function(t){
+    var mecKey=Object.keys(USUARIOS).find(function(k){return USUARIOS[k].nombre===t.mecanico;});
+    var costeHora=mecKey?(USUARIOS[mecKey].coste||0):0;
     (horasMap[t.id]||[]).forEach(function(e){
-      rows+=sesion.rol==='admin'
-        ?'<tr><td>'+t.mecanico+'</td><td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td><td>'+e.tipo+'</td><td>'+Math.floor(e.mins/60)+'h '+(e.mins%60)+'m</td><td>'+e.fecha+'</td></tr>'
+      totalMins+=e.mins;
+      var costeEntry=e.coste!=null?e.coste:parseFloat(((e.mins/60)*costeHora).toFixed(2));
+      totalCoste+=costeEntry;
+      rows+=isAdmin
+        ?'<tr><td>'+t.mecanico+'</td><td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td><td>'+e.tipo+'</td><td>'+Math.floor(e.mins/60)+'h '+(e.mins%60)+'m</td><td>'+costeHora+'€/h</td><td style="color:#185FA5"><strong>'+costeEntry.toFixed(0)+'€</strong></td><td>'+e.fecha+'</td></tr>'
         :'<tr><td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td><td>'+e.tipo+'</td><td>'+Math.floor(e.mins/60)+'h '+(e.mins%60)+'m</td><td>'+e.fecha+'</td></tr>';
     });
   });
-  html+=(rows||'<tr><td colspan="6" style="text-align:center;color:var(--text2);padding:20px">Sin horas registradas</td></tr>')+'</tbody></table></div></div>';
+  html+=(rows||'<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:20px">Sin horas registradas</td></tr>')+'</tbody></table></div></div>';
+  if(isAdmin && rows){
+    html+='<div class="desk-card" style="display:flex;gap:24px;align-items:center">'+
+      '<div><div style="font-size:12px;color:var(--text2)">Total horas</div><div style="font-size:22px;font-weight:500">'+Math.floor(totalMins/60)+'h '+(totalMins%60)+'m</div></div>'+
+      '<div style="width:1px;height:40px;background:var(--border)"></div>'+
+      '<div><div style="font-size:12px;color:var(--text2)">Coste total mano de obra</div><div style="font-size:22px;font-weight:500;color:#185FA5">'+totalCoste.toFixed(0)+'€</div></div>'+
+    '</div>';
+  }
   document.getElementById('desk-horas-content').innerHTML=html;
 }
+
 function deskRenderFac(){
   var el=document.getElementById('desk-fac-content');
   if(sesion.rol!=='admin'){el.innerHTML='<div class="locked-box">Solo el administrador puede ver la facturación completa.</div>';return;}
@@ -1019,6 +996,7 @@ function deskRenderFac(){
   html+='</tbody></table></div></div>';
   el.innerHTML=html;
 }
+
 function deskRenderNotas(){
   var ns=sesion.rol==='admin'?notas:notas.filter(function(n){return n.mec===sesion.nombre;});
   var typeL={pendiente:'Parte pendiente',presupuesto:'Presupuesto',foto:'Fotografía'};
@@ -1039,16 +1017,101 @@ function deskRenderNotas(){
   });
   document.getElementById('desk-notas-content').innerHTML=html;
 }
+
 function deskRenderMecanicos(){
-  var mecs=[{nombre:'Carlos M.',user:'carlos',esp:'Mecánica, suspensión'},{nombre:'Paco R.',user:'paco',esp:'Diagnóstico electrónico'},{nombre:'Luis T.',user:'luis',esp:'Motor, distribución'},{nombre:'Ana V.',user:'ana',esp:'Chapa y pintura'}];
+  var mecs=Object.keys(USUARIOS).filter(function(k){return USUARIOS[k].rol==='mecanico';}).map(function(k){return Object.assign({key:k},USUARIOS[k]);});
   document.getElementById('desk-tbl-mec').innerHTML=mecs.map(function(m){
     var mt=trabajos.filter(function(t){return t.mecanico===m.nombre;});
     var act=mt.filter(function(t){return t.estado!=='completado';}).length;
     var mins=mt.reduce(function(s,t){return s+(horasMap[t.id]||[]).reduce(function(a,e){return a+e.mins;},0);},0);
+    var horas=mins/60;
+    var costeTotal=(horas*(m.coste||0));
     var fac=mt.reduce(function(s,t){return s+(t.precio||0);},0);
-    return '<tr><td><strong>'+m.nombre+'</strong></td><td style="color:var(--text2)">'+m.user+'</td><td>'+m.esp+'</td><td>'+act+'</td><td>'+Math.floor(mins/60)+'h</td><td><strong>'+fac.toLocaleString('es-ES')+'€</strong></td></tr>';
+    return '<tr>'+
+      '<td><strong>'+m.nombre+'</strong></td>'+
+      '<td style="color:var(--text2)">'+m.key+'</td>'+
+      '<td>'+m.esp+'</td>'+
+      '<td><strong>'+(m.coste||0)+'€/h</strong></td>'+
+      '<td>'+act+'</td>'+
+      '<td>'+Math.floor(mins/60)+'h '+(mins%60)+'m</td>'+
+      '<td style="color:#185FA5"><strong>'+costeTotal.toFixed(0)+'€</strong></td>'+
+      '<td><strong>'+fac.toLocaleString('es-ES')+'€</strong></td>'+
+      '<td>'+
+        '<a class="act-link" onclick="editarUsuario(\''+m.key+'\')">Editar</a>'+
+        '<a class="act-link" onclick="abrirCambiarPass(\''+m.key+'\')">Contraseña</a>'+
+      '</td>'+
+    '</tr>';
   }).join('');
 }
+
+function editarUsuario(key){
+  var u=USUARIOS[key];
+  document.getElementById('modal-usuario-title').textContent='Editar mecánico';
+  document.getElementById('u-nombre').value=u.nombre;
+  document.getElementById('u-user').value=key;
+  document.getElementById('u-user').disabled=true;
+  document.getElementById('u-pass').value='';
+  document.getElementById('u-pass').placeholder='Dejar vacío para no cambiar';
+  document.getElementById('u-esp').value=u.esp||'';
+  document.getElementById('u-coste').value=u.coste||0;
+  document.getElementById('u-edit-key').value=key;
+  openModal('modal-usuario');
+}
+
+function guardarUsuario(){
+  var nombre=document.getElementById('u-nombre').value.trim();
+  var user=document.getElementById('u-user').value.trim().toLowerCase();
+  var pass=document.getElementById('u-pass').value;
+  var esp=document.getElementById('u-esp').value.trim();
+  var coste=parseFloat(document.getElementById('u-coste').value)||0;
+  var editKey=document.getElementById('u-edit-key').value;
+  if(!nombre||!user){showToast('Rellena nombre y usuario');return;}
+  if(!editKey && !pass){showToast('La contraseña es obligatoria para nuevo mecánico');return;}
+  if(editKey){
+    USUARIOS[editKey].nombre=nombre;
+    USUARIOS[editKey].esp=esp;
+    USUARIOS[editKey].coste=coste;
+    if(pass) USUARIOS[editKey].pass=pass;
+  } else {
+    if(USUARIOS[user]){showToast('Ese usuario ya existe');return;}
+    USUARIOS[user]={pass:pass,rol:'mecanico',nombre:nombre,esp:esp,coste:coste};
+  }
+  document.getElementById('u-user').disabled=false;
+  document.getElementById('u-edit-key').value='';
+  document.getElementById('modal-usuario-title').textContent='Nuevo mecánico';
+  ['u-nombre','u-user','u-pass','u-esp','u-coste'].forEach(function(id){document.getElementById(id).value='';});
+  closeModal('modal-usuario');
+  showToast(editKey?'Mecánico actualizado ✓':'Mecánico creado ✓');
+  deskRenderMecanicos();
+  actualizarSelectMecanicos();
+}
+
+function abrirCambiarPass(key){
+  document.getElementById('cp-key').value=key;
+  document.getElementById('cp-nombre').textContent=USUARIOS[key].nombre;
+  document.getElementById('cp-pass').value='';
+  document.getElementById('cp-pass2').value='';
+  openModal('modal-cambiar-pass');
+}
+
+function cambiarPassword(){
+  var key=document.getElementById('cp-key').value;
+  var p1=document.getElementById('cp-pass').value;
+  var p2=document.getElementById('cp-pass2').value;
+  if(!p1){showToast('Escribe la nueva contraseña');return;}
+  if(p1!==p2){showToast('Las contraseñas no coinciden');return;}
+  if(p1.length<6){showToast('La contraseña debe tener al menos 6 caracteres');return;}
+  USUARIOS[key].pass=p1;
+  closeModal('modal-cambiar-pass');
+  showToast('Contraseña cambiada ✓');
+}
+
+function actualizarSelectMecanicos(){
+  var mecs=Object.keys(USUARIOS).filter(function(k){return USUARIOS[k].rol==='mecanico';}).map(function(k){return USUARIOS[k].nombre;});
+  var sel=document.getElementById('nw-mec');
+  if(sel) sel.innerHTML=mecs.map(function(n){return '<option>'+n+'</option>';}).join('');
+}
+
 function deskVerDetalle(id){
   var t=trabajos.find(function(j){return j.id===id;});if(!t)return;
   var si=ESTADOS.indexOf(t.estado);
@@ -1089,6 +1152,7 @@ function deskVerDetalle(id){
   document.getElementById('desk-modal-detalle').classList.add('open');
 }
 function closeDesktopDetalle(){document.getElementById('desk-modal-detalle').classList.remove('open');}
+
 // MODALES
 function openModal(id){
   if(id==='modal-nuevo-nota'){
@@ -1109,5 +1173,10 @@ function selChip(el,inputId){
   document.getElementById('nota-img-wrap').style.display=el.dataset.v==='foto'?'block':'none';
 }
 function simularFoto(){document.getElementById('img-upload-text').textContent='✅ Fotografía adjunta: foto.jpg';}
+
 // INICIO — ocultar loading
-setLoading(false);</script>
+setLoading(false);
+actualizarSelectMecanicos();
+</script>
+</body>
+</html>
