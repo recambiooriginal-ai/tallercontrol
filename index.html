@@ -39,9 +39,10 @@ button{cursor:pointer;}
 .b-recepcion{background:var(--blue-bg);color:var(--blue-text);}
 .b-diagnostico{background:var(--amber-bg);color:var(--amber-text);}
 .b-reparacion{background:var(--purple-bg);color:var(--purple-text);}
-.b-revision{background:var(--teal-bg);color:var(--teal-text);}
+.b-pausa{background:#FAEEDA;color:#633806;}
+.b-recambio{background:#FAECE7;color:#712B13;}
+.b-terminado{background:var(--teal-bg);color:var(--teal-text);}
 .b-entrega{background:var(--green-bg);color:var(--green-text);}
-.b-espera{background:#FBEAF0;color:#72243E;}
 .b-completado{background:var(--gray-bg);color:var(--gray-text);}
 .b-urgente{background:var(--red-bg);color:var(--red-text);}
 
@@ -112,9 +113,9 @@ button{cursor:pointer;}
 .mob-job-tipo{font-size:12px;color:var(--text2);margin-top:5px;}
 .mob-progress{height:4px;background:var(--bg3);border-radius:2px;margin-top:8px;overflow:hidden;}
 .mob-progress-fill{height:100%;border-radius:2px;}
-.pf-recepcion{width:10%;background:#378ADD;}.pf-diagnostico{width:30%;background:#BA7517;}
-.pf-reparacion{width:55%;background:#7F77DD;}.pf-espera{width:70%;background:#D4537E;}
-.pf-revision{width:82%;background:#1D9E75;}
+.pf-recepcion{width:8%;background:#378ADD;}.pf-diagnostico{width:20%;background:#BA7517;}
+.pf-reparacion{width:55%;background:#7F77DD;}.pf-pausa{width:55%;background:#BA7517;}
+.pf-recambio{width:55%;background:#D85A30;}.pf-terminado{width:80%;background:#1D9E75;}
 .pf-entrega{width:95%;background:#639922;}.pf-completado{width:100%;background:#888780;}
 .mob-job-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:12px;color:var(--text2);}
 .mob-kanban-scroll{overflow-x:auto;margin:0 -12px;padding:0 12px 8px;}
@@ -122,8 +123,8 @@ button{cursor:pointer;}
 .mob-kcol{width:160px;}
 .mob-kcol-head{font-size:11px;font-weight:500;padding:6px 10px;border-radius:7px;margin-bottom:7px;text-align:center;}
 .kch-recepcion{background:#B5D4F4;color:#0C447C;}.kch-diagnostico{background:#FAC775;color:#633806;}
-.kch-reparacion{background:#CECBF6;color:#3C3489;}.kch-revision{background:#9FE1CB;color:#085041;}
-.kch-espera{background:#F4C0D1;color:#72243E;}
+.kch-reparacion{background:#CECBF6;color:#3C3489;}.kch-pausa{background:#FAEEDA;color:#633806;}
+.kch-recambio{background:#F5C4B3;color:#712B13;}.kch-terminado{background:#9FE1CB;color:#085041;}
 .kch-entrega{background:#C0DD97;color:#27500A;}
 .mob-kitem{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px;margin-bottom:6px;cursor:pointer;font-size:12px;}
 .mob-ki-mat{font-weight:500;color:var(--text);}
@@ -343,9 +344,10 @@ tbody tr:hover td{background:var(--bg2);}
           <option value="">Todos los estados</option>
           <option value="recepcion">Recepción</option>
           <option value="diagnostico">Diagnóstico</option>
-          <option value="reparacion">Reparación</option>
-          <option value="espera">En espera</option>
-          <option value="revision">Revisión</option>
+          <option value="reparacion">En reparación</option>
+          <option value="pausa">En pausa</option>
+          <option value="recambio">Pendiente recambio</option>
+          <option value="terminado">Terminado</option>
           <option value="entrega">Entrega</option>
           <option value="completado">Completado</option>
         </select>
@@ -502,9 +504,11 @@ function supaUpdate(table, id, data){
 // DATOS EN MEMORIA
 // ═══════════════════════════════════
 var USUARIOS = {};
-var ESTADOS = ['recepcion','diagnostico','reparacion','espera','revision','entrega','completado'];
-var EL = {recepcion:'Recepción',diagnostico:'Diagnóstico',reparacion:'Reparación',espera:'En espera',revision:'Revisión',entrega:'Entrega',completado:'Completado'};
-var EN = {recepcion:'diagnostico',diagnostico:'reparacion',reparacion:'espera',espera:'revision',revision:'entrega',entrega:'completado'};
+var ESTADOS = ['recepcion','diagnostico','reparacion','pausa','recambio','terminado','entrega','completado'];
+var EL = {recepcion:'Recepción',diagnostico:'Diagnóstico',reparacion:'En reparación',pausa:'En pausa',recambio:'Pendiente recambio',terminado:'Terminado',entrega:'Entrega',completado:'Completado'};
+var EN = {recepcion:'diagnostico',diagnostico:'reparacion',reparacion:'pausa',pausa:'reparacion',recambio:'reparacion',terminado:'reparacion',entrega:'completado'};
+var ESTADOS_MEC = ['reparacion','pausa','recambio','terminado'];
+var ESTADOS_ADMIN_FULL = ['recepcion','diagnostico','reparacion','pausa','recambio','terminado','entrega','completado'];
 
 var sesion = null;
 var isMobile = window.innerWidth < 768;
@@ -649,29 +653,58 @@ function crearTrabajo(){
 // ═══════════════════════════════════
 // AVANZAR ESTADO
 // ═══════════════════════════════════
-function avanzar(id, callback){
+function cambiarEstado(id, nuevoEstado, callback){
   var t=trabajos.find(function(j){return j.id===id;});
-  if(!t||!EN[t.estado])return;
-  var nuevoEstado=EN[t.estado];
+  if(!t)return;
+  // Auto-detener cronómetro si sale de reparación
+  if(t.estado==='reparacion' && activeTimers[id]){
+    stopTimerSilente(id);
+  }
   supaUpdate('trabajos', id, {estado:nuevoEstado}).then(function(){
     t.estado=nuevoEstado;
-    showToast('Estado actualizado ✓');
+    // Auto-arrancar cronómetro al entrar en reparación
+    if(nuevoEstado==='reparacion'){
+      activeTimers[id]=Date.now();
+      showToast('En reparación — cronómetro iniciado ✓');
+    } else if(nuevoEstado==='pausa'){
+      showToast('En pausa — cronómetro detenido ✓');
+    } else if(nuevoEstado==='recambio'){
+      showToast('Pendiente de recambio ✓');
+    } else if(nuevoEstado==='terminado'){
+      showToast('Trabajo terminado ✓');
+    } else {
+      showToast('Estado actualizado ✓');
+    }
     if(callback)callback();
     else if(isMobile)mobShowPage('inicio');
     else deskRenderPage(document.querySelector('.desk-page.active').id.replace('desk-page-',''));
   }).catch(function(){showToast('Error al actualizar');});
 }
 
-function reabrir(id, callback){
+function avanzar(id, callback){
   var t=trabajos.find(function(j){return j.id===id;});
-  if(!t)return;
-  supaUpdate('trabajos', id, {estado:'reparacion'}).then(function(){
-    t.estado='reparacion';
-    showToast('Trabajo reabierto ✓');
-    if(callback)callback();
-    else if(isMobile)mobShowPage('trabajos');
-    else deskRenderPage(document.querySelector('.desk-page.active').id.replace('desk-page-',''));
-  }).catch(function(){showToast('Error al reabrir');});
+  if(!t||!EN[t.estado])return;
+  cambiarEstado(id, EN[t.estado], callback);
+}
+
+function reabrir(id, callback){
+  cambiarEstado(id, 'reparacion', callback);
+}
+
+function stopTimerSilente(id){
+  var st=activeTimers[id];if(!st)return;
+  var mins=Math.max(1,Math.round((Date.now()-st)/60000));
+  delete activeTimers[id];
+  var t=trabajos.find(function(j){return j.id===id;});
+  var mecKey=Object.keys(USUARIOS).find(function(k){return USUARIOS[k].nombre===(t?t.mecanico:'');});
+  var costeHora=mecKey?(USUARIOS[mecKey].coste||0):0;
+  var coste=parseFloat(((mins/60)*costeHora).toFixed(2));
+  var nuevaHora={trabajo_id:id, tipo:'Mano de obra', mins:mins, fecha:hoy(), coste:coste};
+  supaInsert('horas', nuevaHora).then(function(res){
+    var h=res&&res[0]?res[0]:nuevaHora;
+    if(!horasMap[id])horasMap[id]=[];
+    horasMap[id].push(h);
+  });
 }
 
 // ═══════════════════════════════════
@@ -794,11 +827,21 @@ function mobRenderInicio(){
     '<div class="mob-mc"><div class="mob-mc-label">Horas</div><div class="mob-mc-val">'+Math.floor(mins/60)+'h</div></div>'+
     '<div class="mob-mc"><div class="mob-mc-label">'+(sesion.rol==='admin'?'Facturado':'Mis ingresos')+'</div><div class="mob-mc-val">'+fac.toLocaleString('es-ES')+'€</div></div>'+
   '</div>';
+  var recambios=ts.filter(function(t){return t.estado==='recambio';});
+  if(recambios.length){
+    html+='<div style="background:#FAECE7;border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px;">'+
+      '<span style="font-size:16px">🔩</span>'+
+      '<div><div style="font-size:12px;font-weight:500;color:#712B13">'+recambios.length+' trabajo'+(recambios.length>1?'s':'')+' pendiente'+(recambios.length>1?'s':'')+' de recambio</div>'+
+      '<div style="font-size:11px;color:#993C1D">'+recambios.map(function(t){return t.matricula;}).join(', ')+'</div></div>'+
+    '</div>';
+  }
   var urgentes=ts.filter(function(t){return t.urgente&&t.estado!=='completado';});
   if(urgentes.length)html+='<div class="mob-section-title">Urgentes</div>'+urgentes.map(mobJobCard).join('');
   var rep=ts.filter(function(t){return t.estado==='reparacion';});
   if(rep.length)html+='<div class="mob-section-title">En reparación</div>'+rep.map(mobJobCard).join('');
-  if(!urgentes.length&&!rep.length){
+  var pausa=ts.filter(function(t){return t.estado==='pausa';});
+  if(pausa.length)html+='<div class="mob-section-title">En pausa</div>'+pausa.map(mobJobCard).join('');
+  if(!urgentes.length&&!rep.length&&!pausa.length&&!recambios.length){
     html+='<div class="mob-section-title">Trabajos recientes</div>'+ts.slice(0,6).map(mobJobCard).join('');
   }
   if(!ts.length)html+='<div class="empty-state">Sin trabajos registrados.<br>Pulsa + para añadir el primero.</div>';
@@ -877,37 +920,71 @@ function mobRenderNotas(){
 
 function mobVerDetalle(id){
   var t=trabajos.find(function(j){return j.id===id;});if(!t)return;
-  var si=ESTADOS.indexOf(t.estado);
-  var steps=ESTADOS.map(function(e,i){
-    var c=i<si?'#639922':i===si?'#7F77DD':'#ccc';
-    var bold=i===si?'font-weight:500':'';
-    return '<div class="mob-step"><div class="mob-step-dot" style="background:'+c+'"></div>'+
-      '<span style="font-size:13px;'+bold+'">'+EL[e]+(i===si?' ←':'')+' </span></div>'+
-      (i<ESTADOS.length-1?'<div class="mob-step-line"></div>':'');
-  }).join('');
   var isAdmin=sesion.rol==='admin';
   var nt=notas.filter(function(n){return n.job_id===id;});
   var hs=horasMap[id]||[];
   var typeL={pendiente:'Parte pendiente',presupuesto:'Presupuesto',foto:'Fotografía'};
+  var isActive=!!activeTimers[id];
+  var mins=hs.reduce(function(s,e){return s+e.mins;},0);
+  if(isActive) mins+=Math.round((Date.now()-activeTimers[id])/60000);
+
+  // Botones de acción según rol y estado
+  var botonesHtml='';
+  if(isAdmin){
+    var si=ESTADOS.indexOf(t.estado);
+    var steps=ESTADOS.map(function(e,i){
+      var c=i<si?'#639922':i===si?'#7F77DD':'#ccc';
+      var bold=i===si?'font-weight:500':'';
+      return '<div class="mob-step"><div class="mob-step-dot" style="background:'+c+'"></div>'+
+        '<span style="font-size:13px;'+bold+'">'+EL[e]+(i===si?' ←':'')+' </span></div>'+
+        (i<ESTADOS.length-1?'<div class="mob-step-line"></div>':'');
+    }).join('');
+    botonesHtml='<div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:8px">Proceso</div>'+
+      '<div class="mob-det-section">'+steps+'</div>'+
+      (EN[t.estado]?'<button class="mob-avanzar" onclick="cambiarEstado(\''+t.id+'\',\''+EN[t.estado]+'\',function(){mobVerDetalle(\''+t.id+'\')})">Avanzar a '+EL[EN[t.estado]]+' →</button>':'')+
+      (['terminado','pausa','recambio','completado'].indexOf(t.estado)>=0?'<button class="mob-avanzar" style="background:#185FA5;margin-top:8px" onclick="cambiarEstado(\''+t.id+'\',\'reparacion\',function(){mobVerDetalle(\''+t.id+'\')})">🔧 Reanudar reparación</button>':'');
+  } else {
+    // Vista mecánico: botones simples
+    botonesHtml='<div style="margin-top:4px">';
+    if(t.estado==='reparacion'){
+      botonesHtml+=
+        '<button class="mob-avanzar" style="background:#BA7517" onclick="cambiarEstado(\''+t.id+'\',\'pausa\',function(){mobVerDetalle(\''+t.id+'\')})">⏸ Poner en pausa</button>'+
+        '<button class="mob-avanzar" style="background:#D85A30;margin-top:8px" onclick="cambiarEstado(\''+t.id+'\',\'recambio\',function(){mobVerDetalle(\''+t.id+'\')})">🔩 Pendiente de recambio</button>'+
+        '<button class="mob-avanzar" style="background:#1D9E75;margin-top:8px" onclick="cambiarEstado(\''+t.id+'\',\'terminado\',function(){mobVerDetalle(\''+t.id+'\')})">✅ Marcar terminado</button>';
+    } else if(t.estado==='pausa'||t.estado==='recambio'||t.estado==='terminado'){
+      botonesHtml+=
+        '<button class="mob-avanzar" onclick="cambiarEstado(\''+t.id+'\',\'reparacion\',function(){mobVerDetalle(\''+t.id+'\')})">🔧 Reanudar reparación</button>';
+      if(t.estado==='terminado'){
+        botonesHtml+=
+          '<button class="mob-avanzar" style="background:#D85A30;margin-top:8px" onclick="cambiarEstado(\''+t.id+'\',\'recambio\',function(){mobVerDetalle(\''+t.id+'\')})">🔩 Pendiente de recambio</button>';
+      }
+    } else if(t.estado==='recepcion'||t.estado==='diagnostico'){
+      botonesHtml+='<button class="mob-avanzar" onclick="cambiarEstado(\''+t.id+'\',\'reparacion\',function(){mobVerDetalle(\''+t.id+'\')})">🔧 Iniciar reparación</button>';
+    }
+    botonesHtml+='</div>';
+  }
+
   document.getElementById('mob-detalle-content').innerHTML=
     '<button class="mob-back-btn" onclick="closeMobDetalle()">← Volver</button>'+
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'+
-      '<div><div style="font-size:18px;font-weight:500">'+t.matricula+'</div><div style="font-size:14px;color:var(--text2)">'+t.vehiculo+'</div><div style="font-size:12px;color:var(--text3)">'+t.cliente+'</div></div>'+
+      '<div><div style="font-size:18px;font-weight:500">'+t.matricula+'</div>'+
+      '<div style="font-size:14px;color:var(--text2)">'+t.vehiculo+'</div>'+
+      '<div style="font-size:12px;color:var(--text3)">'+t.cliente+'</div></div>'+
       badge(t.estado)+
     '</div>'+
+    // Timer activo visible
+    (isActive?'<div style="display:flex;align-items:center;gap:8px;background:#EEEDFE;border-radius:9px;padding:10px 14px;margin-bottom:12px;">'+
+      '<span style="width:8px;height:8px;border-radius:50%;background:#7F77DD;display:inline-block;animation:pulse 1.2s infinite"></span>'+
+      '<span style="font-size:13px;font-weight:500;color:#3C3489">Cronómetro activo — '+Math.floor(mins/60)+'h '+(mins%60)+'m</span></div>':'')+ 
     '<div class="mob-det-section">'+
-      '<div class="mob-det-row"><span class="mob-det-key">Teléfono</span><span class="mob-det-val">'+t.tel+'</span></div>'+
       '<div class="mob-det-row"><span class="mob-det-key">Trabajo</span><span class="mob-det-val">'+t.tipo+'</span></div>'+
       '<div class="mob-det-row"><span class="mob-det-key">Mecánico</span><span class="mob-det-val">'+t.mecanico+'</span></div>'+
-      '<div class="mob-det-row"><span class="mob-det-key">Horas</span><span class="mob-det-val">'+th(t)+'</span></div>'+
+      '<div class="mob-det-row"><span class="mob-det-key">Horas totales</span><span class="mob-det-val">'+Math.floor(mins/60)+'h '+(mins%60)+'m</span></div>'+
       (isAdmin?'<div class="mob-det-row"><span class="mob-det-key">Precio</span><span class="mob-det-val" style="color:green">'+(t.precio||0).toLocaleString('es-ES')+'€</span></div>':'')+
+      '<div class="mob-det-row"><span class="mob-det-key">Tel. cliente</span><span class="mob-det-val">'+t.tel+'</span></div>'+
       '<div class="mob-det-row"><span class="mob-det-key">Urgente</span><span class="mob-det-val">'+(t.urgente?'🔴 Sí':'No')+'</span></div>'+
-      '<div class="mob-det-row"><span class="mob-det-key">Fecha entrada</span><span class="mob-det-val">'+t.fecha+'</span></div>'+
     '</div>'+
-    '<div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:8px">Proceso</div>'+
-    '<div class="mob-det-section">'+steps+'</div>'+
-    (EN[t.estado]?'<button class="mob-avanzar" onclick="avanzar(\''+t.id+'\',function(){mobVerDetalle(\''+t.id+'\')})">Avanzar a '+EL[EN[t.estado]]+' →</button>':'')+
-    (t.estado==='completado'?'<button class="mob-avanzar" style="background:#185FA5;margin-top:8px" onclick="reabrir(\''+t.id+'\',function(){mobVerDetalle(\''+t.id+'\')})">↩ Reabrir trabajo</button>':'')+
+    botonesHtml+
     (t.obs?'<div style="margin-top:12px;background:var(--bg3);border-radius:9px;padding:12px;font-size:13px;color:var(--text2)"><strong>Observaciones:</strong><br>'+t.obs+'</div>':'')+
     '<div style="margin-top:16px;">'+
       '<div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:8px">Notas y fotografías ('+nt.length+')</div>'+
@@ -965,12 +1042,17 @@ function deskRenderDashboard(){
   var completados=ts.filter(function(t){return t.estado==='completado';}).length;
   var mins=ts.reduce(function(s,t){return s+(horasMap[t.id]||[]).reduce(function(a,e){return a+e.mins;},0);},0);
   var fac=ts.reduce(function(s,t){return s+(t.precio||0);},0);
+  var recambios=ts.filter(function(t){return t.estado==='recambio';});
   document.getElementById('desk-dash-title').textContent=sesion.rol==='admin'?'Panel general':'Mis trabajos';
   document.getElementById('desk-metrics').innerHTML=
     '<div class="desk-mc"><div class="desk-mc-label">Activos</div><div class="desk-mc-val">'+activos+'</div><div class="desk-mc-sub">en proceso</div></div>'+
     '<div class="desk-mc"><div class="desk-mc-label">Completados</div><div class="desk-mc-val">'+completados+'</div></div>'+
     '<div class="desk-mc"><div class="desk-mc-label">Horas acumuladas</div><div class="desk-mc-val">'+Math.floor(mins/60)+'h</div></div>'+
-    '<div class="desk-mc"><div class="desk-mc-label">'+(sesion.rol==='admin'?'Facturado total':'Mis ingresos')+'</div><div class="desk-mc-val">'+fac.toLocaleString('es-ES')+'€</div></div>';
+    '<div class="desk-mc" style="'+(recambios.length?'background:#FAECE7;':'')+'">' +
+      '<div class="desk-mc-label">Pendiente recambio</div>'+
+      '<div class="desk-mc-val" style="'+(recambios.length?'color:#712B13;':'')+'">'+recambios.length+'</div>'+
+      (recambios.length?'<div class="desk-mc-sub" style="color:#993C1D">'+recambios.map(function(t){return t.matricula;}).join(', ')+'</div>':'')+
+    '</div>';
   var act=ts.filter(function(t){return t.estado!=='completado';});
   document.querySelector('#desk-tbl-dash tbody').innerHTML=act.slice(0,8).map(function(t){
     return '<tr><td>'+t.id+'</td><td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td><td>'+badge(t.estado)+'</td><td>'+t.mecanico+'</td><td>'+th(t)+'</td><td><a class="act-link" onclick="deskVerDetalle(\''+t.id+'\')">Ver</a></td></tr>';
@@ -1217,8 +1299,15 @@ function deskVerDetalle(id){
       '<div>'+
         '<div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:10px">Proceso</div>'+
         steps+
-        (EN[t.estado]?'<button class="desk-avanzar" onclick="avanzar(\''+t.id+'\',function(){deskVerDetalle(\''+t.id+'\')})">Avanzar a '+EL[EN[t.estado]]+' →</button>':'')+
-        (t.estado==='completado'?'<button class="desk-avanzar" style="background:#185FA5;margin-top:8px" onclick="reabrir(\''+t.id+'\',function(){deskVerDetalle(\''+t.id+'\')})">↩ Reabrir trabajo</button>':'')+
+        (EN[t.estado]&&isAdmin?'<button class="desk-avanzar" onclick="cambiarEstado(\''+t.id+'\',\''+EN[t.estado]+'\',function(){deskVerDetalle(\''+t.id+'\')})">Avanzar a '+EL[EN[t.estado]]+' →</button>':'')+
+        (!isAdmin&&t.estado==='reparacion'?
+          '<button class="desk-avanzar" style="background:#BA7517;margin-top:6px" onclick="cambiarEstado(\''+t.id+'\',\'pausa\',function(){deskVerDetalle(\''+t.id+'\')})">⏸ Poner en pausa</button>'+
+          '<button class="desk-avanzar" style="background:#D85A30;margin-top:6px" onclick="cambiarEstado(\''+t.id+'\',\'recambio\',function(){deskVerDetalle(\''+t.id+'\')})">🔩 Pendiente recambio</button>'+
+          '<button class="desk-avanzar" style="background:#1D9E75;margin-top:6px" onclick="cambiarEstado(\''+t.id+'\',\'terminado\',function(){deskVerDetalle(\''+t.id+'\')})">✅ Marcar terminado</button>':'')+
+        (!isAdmin&&(t.estado==='pausa'||t.estado==='recambio'||t.estado==='terminado')?
+          '<button class="desk-avanzar" onclick="cambiarEstado(\''+t.id+'\',\'reparacion\',function(){deskVerDetalle(\''+t.id+'\')})">🔧 Reanudar reparación</button>':'')+
+        (isAdmin&&['terminado','pausa','recambio','completado'].indexOf(t.estado)>=0?
+          '<button class="desk-avanzar" style="background:#185FA5;margin-top:6px" onclick="cambiarEstado(\''+t.id+'\',\'reparacion\',function(){deskVerDetalle(\''+t.id+'\')})">🔧 Reanudar reparación</button>':'')+
       '</div>'+
     '</div>'+
     (t.obs?'<div style="margin-top:14px;background:var(--bg2);border-radius:8px;padding:12px;font-size:13px;color:var(--text2)"><strong>Observaciones:</strong><br>'+t.obs+'</div>':'')+
