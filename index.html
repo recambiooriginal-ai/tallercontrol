@@ -566,6 +566,13 @@ function cargarDatos(){
     var us = Array.isArray(res[3]) ? res[3] : [];
     USUARIOS = {};
     us.forEach(function(u){ USUARIOS[u.key] = u; });
+    // Restaurar cronómetros activos desde Supabase
+    activeTimers = {};
+    trabajos.forEach(function(t){
+      if(t.estado==='reparacion' && t.timer_inicio){
+        activeTimers[t.id] = new Date(t.timer_inicio).getTime();
+      }
+    });
     actualizarSelectMecanicos();
     setLoading(false);
   }).catch(function(){
@@ -656,21 +663,31 @@ function crearTrabajo(){
 function cambiarEstado(id, nuevoEstado, callback){
   var t=trabajos.find(function(j){return j.id===id;});
   if(!t)return;
-  // Auto-detener cronómetro si sale de reparación
+  var datos={estado:nuevoEstado};
+  // Si sale de reparación, guardar horas y borrar timer
   if(t.estado==='reparacion' && activeTimers[id]){
     stopTimerSilente(id);
+    datos.timer_inicio=null;
   }
-  supaUpdate('trabajos', id, {estado:nuevoEstado}).then(function(){
+  // Si entra en reparación, guardar hora de inicio en Supabase
+  if(nuevoEstado==='reparacion'){
+    var ahora=new Date().toISOString();
+    datos.timer_inicio=ahora;
+    activeTimers[id]=Date.now();
+  }
+  supaUpdate('trabajos', id, datos).then(function(){
     t.estado=nuevoEstado;
-    // Auto-arrancar cronómetro al entrar en reparación
     if(nuevoEstado==='reparacion'){
-      activeTimers[id]=Date.now();
+      t.timer_inicio=datos.timer_inicio;
       showToast('En reparación — cronómetro iniciado ✓');
     } else if(nuevoEstado==='pausa'){
+      t.timer_inicio=null;
       showToast('En pausa — cronómetro detenido ✓');
     } else if(nuevoEstado==='recambio'){
+      t.timer_inicio=null;
       showToast('Pendiente de recambio ✓');
     } else if(nuevoEstado==='terminado'){
+      t.timer_inicio=null;
       showToast('Trabajo terminado ✓');
     } else {
       showToast('Estado actualizado ✓');
@@ -706,7 +723,6 @@ function stopTimerSilente(id){
     horasMap[id].push(h);
   });
 }
-
 // ═══════════════════════════════════
 // CREAR NOTA
 // ═══════════════════════════════════
