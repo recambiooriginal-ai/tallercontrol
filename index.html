@@ -205,8 +205,20 @@ tbody tr:hover td{background:var(--bg2);}
 .desk-kanban-wrap{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;}
 .desk-kcol{min-width:170px;flex:1;}
 .desk-kcol-head{font-size:12px;font-weight:500;padding:7px 10px;border-radius:7px;margin-bottom:8px;text-align:center;}
-.desk-kitem{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;cursor:pointer;font-size:12px;}
+.desk-kitem{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;cursor:grab;font-size:12px;transition:opacity .15s,transform .15s;}
 .desk-kitem:hover{border-color:var(--border2);}
+.desk-kitem.dragging{opacity:.4;transform:scale(.97);}
+.desk-kcol.drag-over .desk-kcol-head{filter:brightness(.93);}
+.desk-kcol-drop{min-height:40px;border:2px dashed var(--border2);border-radius:8px;margin-bottom:6px;display:none;}
+.desk-kcol.drag-over .desk-kcol-drop{display:block;}
+.mob-search-bar{display:flex;gap:8px;margin-bottom:12px;}
+.mob-search-bar input{flex:1;padding:10px 13px;border:1px solid var(--border2);border-radius:9px;font-size:14px;color:var(--text);background:var(--bg);outline:none;}
+.cuello-alerta{background:#FAECE7;border:1px solid #F0997B;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:13px;color:#712B13;}
+.multitarea-bar{background:var(--bg);border-top:1px solid var(--border);padding:10px 12px;position:fixed;bottom:60px;left:0;right:0;z-index:15;display:none;}
+.multitarea-bar.visible{display:flex;gap:8px;overflow-x:auto;}
+.mt-chip{flex-shrink:0;background:#EEEDFE;border-radius:20px;padding:6px 12px;font-size:12px;color:#3C3489;display:flex;align-items:center;gap:6px;cursor:pointer;}
+.mt-chip .timer-dot{background:#7F77DD;}
+.speech-btn{background:none;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text2);cursor:pointer;margin-top:6px;width:100%;text-align:left;}
 .desk-ki-mat{font-weight:500;color:var(--text);}
 .desk-ki-veh{color:var(--text2);margin-top:2px;font-size:11px;}
 .desk-ki-cli{color:var(--text3);font-size:11px;margin-top:1px;}
@@ -293,12 +305,17 @@ tbody tr:hover td{background:var(--bg2);}
   </div>
   <div class="mob-content">
     <div class="mob-page active" id="mob-page-inicio"></div>
-    <div class="mob-page" id="mob-page-trabajos"></div>
+    <div class="mob-page" id="mob-page-trabajos">
+      <div class="mob-search-bar">
+        <input id="mob-search-t" placeholder="Buscar matrícula, vehículo..." oninput="mobRenderTrabajos()"/>
+      </div>
+    </div>
     <div class="mob-page" id="mob-page-proceso"></div>
     <div class="mob-page" id="mob-page-horas"></div>
     <div class="mob-page" id="mob-page-notas"></div>
   </div>
   <button class="mob-fab" onclick="openModal('modal-nuevo')">+</button>
+  <div class="multitarea-bar" id="multitarea-bar"></div>
 </div>
 
 <!-- ESCRITORIO -->
@@ -436,7 +453,10 @@ tbody tr:hover td{background:var(--bg2);}
     </div>
     <input type="hidden" id="nota-tipo" value="pendiente"/>
   </div>
-  <div class="fg"><label>Descripción *</label><textarea id="nota-texto" placeholder="Describe la nota..."></textarea></div>
+  <div class="fg"><label>Descripción *</label>
+    <textarea id="nota-texto" placeholder="Describe la nota..."></textarea>
+    <button class="speech-btn" onclick="iniciarVoz()" id="btn-voz">🎤 Pulsa para dictar con la voz</button>
+  </div>
   <div class="fg" id="nota-precio-wrap" style="display:none"><label>Importe (€)</label><input id="nota-precio" type="number" min="0" placeholder="0"/></div>
   <div class="img-upload-area" id="nota-img-wrap" style="display:none" onclick="document.getElementById('nota-file-input').click()">
     <div id="img-upload-text">📷 Haz clic para adjuntar fotografía</div>
@@ -609,6 +629,7 @@ function doLogin(){
         deskBuildSidebar();
         deskShowPage('dashboard');
       }
+      iniciarAutoRefresh();
     });
   } else {
     document.getElementById('err-msg').style.display='block';
@@ -617,6 +638,7 @@ function doLogin(){
 function quickLogin(u,p){document.getElementById('l-user').value=u;document.getElementById('l-pass').value=p;doLogin();}
 function doLogout(){
   sesion=null;trabajos=[];horasMap={};notas=[];
+  detenerAutoRefresh();
   document.getElementById('screen-main').classList.remove('active');
   document.getElementById('screen-login').classList.add('active');
   document.getElementById('l-user').value='';document.getElementById('l-pass').value='';
@@ -865,10 +887,16 @@ function mobRenderInicio(){
 }
 
 function mobRenderTrabajos(){
-  var ts=misTrab();
-  document.getElementById('mob-page-trabajos').innerHTML=
-    '<div class="mob-section-title">Todos los trabajos ('+ts.length+')</div>'+
+  var q=(document.getElementById('mob-search-t')||{value:''}).value.toLowerCase();
+  var ts=misTrab().filter(function(t){
+    return !q||(t.matricula+t.vehiculo+t.cliente+t.tipo).toLowerCase().indexOf(q)>=0;
+  });
+  var contenedor=document.getElementById('mob-page-trabajos');
+  var buscador=contenedor.querySelector('.mob-search-bar');
+  var html='<div class="mob-section-title">Todos los trabajos ('+ts.length+')</div>'+
     (ts.length?ts.map(mobJobCard).join(''):'<div class="empty-state">Sin trabajos.</div>');
+  // Mantener el buscador y añadir el resto
+  contenedor.innerHTML='<div class="mob-search-bar"><input id="mob-search-t" placeholder="Buscar matrícula, vehículo..." oninput="mobRenderTrabajos()" value="'+(q||'')+'"/></div>'+html;
 }
 
 function mobRenderProceso(){
@@ -913,6 +941,7 @@ function mobRenderHoras(){
     '</div>';
   });
   document.getElementById('mob-page-horas').innerHTML=html||'<div class="empty-state">Sin trabajos.</div>';
+  actualizarMultitareaBar();
 }
 
 function mobRenderNotas(){
@@ -1059,7 +1088,28 @@ function deskRenderDashboard(){
   var mins=ts.reduce(function(s,t){return s+(horasMap[t.id]||[]).reduce(function(a,e){return a+e.mins;},0);},0);
   var fac=ts.reduce(function(s,t){return s+(t.precio||0);},0);
   var recambios=ts.filter(function(t){return t.estado==='recambio';});
+  var enRep=ts.filter(function(t){return t.estado==='reparacion';}).length;
+  var enPausa=ts.filter(function(t){return t.estado==='pausa';}).length;
+  var alertas=[];
+  if(enRep>=3) alertas.push('⚠️ '+enRep+' coches en reparación');
+  if(recambios.length>=2) alertas.push('🔩 '+recambios.length+' pendientes de recambio');
+  if(enPausa>=3) alertas.push('⏸ '+enPausa+' en pausa');
   document.getElementById('desk-dash-title').textContent=sesion.rol==='admin'?'Panel general':'Mis trabajos';
+  if(alertas.length){
+    var oldAlerta=document.getElementById('desk-alerta-cuello');
+    if(!oldAlerta){
+      var aDiv=document.createElement('div');
+      aDiv.id='desk-alerta-cuello';
+      aDiv.className='cuello-alerta';
+      aDiv.style.marginBottom='16px';
+      var metrics=document.getElementById('desk-metrics');
+      metrics.parentNode.insertBefore(aDiv,metrics);
+    }
+    document.getElementById('desk-alerta-cuello').innerHTML='⚡ Cuello de botella: '+alertas.join(' · ');
+  } else {
+    var oa=document.getElementById('desk-alerta-cuello');
+    if(oa)oa.remove();
+  }
   document.getElementById('desk-metrics').innerHTML=
     '<div class="desk-mc"><div class="desk-mc-label">Activos</div><div class="desk-mc-val">'+activos+'</div><div class="desk-mc-sub">en proceso</div></div>'+
     '<div class="desk-mc"><div class="desk-mc-label">Completados</div><div class="desk-mc-val">'+completados+'</div></div>'+
@@ -1089,17 +1139,38 @@ function deskRenderTrabajos(){
   }).join('')||'<tr><td colspan="10" style="text-align:center;color:var(--text2);padding:20px">Sin trabajos</td></tr>';
 }
 
+var dragId=null;
 function deskKanbanEl(elId,ts){
   var cols=ESTADOS.filter(function(e){return e!=='completado';});
   document.getElementById(elId).innerHTML=cols.map(function(e){
     var items=ts.filter(function(t){return t.estado===e;});
-    return '<div class="desk-kcol"><div class="desk-kcol-head kch-'+e+'">'+EL[e]+' ('+items.length+')</div>'+
-      items.map(function(t){return '<div class="desk-kitem" onclick="deskVerDetalle(\''+t.id+'\')">'+
-        '<div class="desk-ki-mat">'+t.matricula+'</div>'+
-        '<div class="desk-ki-veh">'+t.vehiculo+'</div>'+
-        '<div class="desk-ki-cli">'+t.cliente+'</div>'+
-        '<div class="desk-ki-bot"><span>'+t.mecanico+'</span><span>'+th(t)+'</span></div></div>';}).join('')+'</div>';
+    var alerta=items.length>=3?' <span style="background:#FAECE7;color:#712B13;border-radius:20px;padding:1px 7px;font-size:10px">!</span>':'';
+    return '<div class="desk-kcol" id="kcol-'+elId+'-'+e+'" ondragover="event.preventDefault();this.classList.add(\'drag-over\')" ondragleave="this.classList.remove(\'drag-over\')" ondrop="dropEnEstado(event,\''+e+'\',\''+elId+'\')" >'+
+      '<div class="desk-kcol-head kch-'+e+'">'+EL[e]+' ('+items.length+')'+alerta+'</div>'+
+      '<div class="desk-kcol-drop"></div>'+
+      items.map(function(t){
+        return '<div class="desk-kitem" draggable="true" ondragstart="dragId=\''+t.id+'\';this.classList.add(\'dragging\')" ondragend="this.classList.remove(\'dragging\')" onclick="deskVerDetalle(\''+t.id+'\')">'+
+          '<div class="desk-ki-mat">'+t.matricula+'</div>'+
+          '<div class="desk-ki-veh">'+t.vehiculo+'</div>'+
+          '<div class="desk-ki-cli">'+t.cliente+'</div>'+
+          '<div class="desk-ki-bot"><span>'+t.mecanico+'</span><span>'+th(t)+'</span></div>'+
+          (activeTimers[t.id]?'<div style="margin-top:4px;font-size:10px;color:#7F77DD">⬤ Cronómetro activo</div>':'')+
+        '</div>';
+      }).join('')+
+    '</div>';
   }).join('');
+}
+function dropEnEstado(event,nuevoEstado,elId){
+  event.preventDefault();
+  document.querySelectorAll('.desk-kcol').forEach(function(c){c.classList.remove('drag-over');});
+  if(!dragId||!nuevoEstado)return;
+  var t=trabajos.find(function(j){return j.id===dragId;});
+  if(!t||t.estado===nuevoEstado){dragId=null;return;}
+  cambiarEstado(dragId,nuevoEstado,function(){
+    deskKanbanEl(elId,misTrab().filter(function(t){return t.estado!=='completado';}));
+    if(elId==='desk-kanban-full')deskRenderKanbanFull();
+  });
+  dragId=null;
 }
 function deskRenderKanbanFull(){deskKanbanEl('desk-kanban-full',misTrab());}
 
@@ -1376,7 +1447,134 @@ function previewFoto(input){
   }
 }
 
+// ═══════════════════════════════════
+// MULTI-TAREA
+// ═══════════════════════════════════
+function actualizarMultitareaBar(){
+  var bar=document.getElementById('multitarea-bar');
+  if(!bar)return;
+  var activos=Object.keys(activeTimers);
+  if(!activos.length){bar.classList.remove('visible');return;}
+  bar.classList.add('visible');
+  bar.innerHTML=activos.map(function(id){
+    var t=trabajos.find(function(j){return j.id===id;});
+    if(!t)return'';
+    var mins=Math.round((Date.now()-activeTimers[id])/60000);
+    return '<div class="mt-chip" onclick="mobVerDetalle(\''+id+'\')">'+
+      '<span class="timer-dot" style="width:6px;height:6px;border-radius:50%;background:#7F77DD;animation:pulse 1.2s infinite;display:inline-block"></span>'+
+      '<span>'+t.matricula+' — '+Math.floor(mins/60)+'h '+(mins%60)+'m</span>'+
+    '</div>';
+  }).join('');
+}
+
+// Al arrancar un trabajo en reparación con otro ya activo,
+// preguntar si pausar el anterior
+var _origCambiarEstado=cambiarEstado;
+cambiarEstado=function(id,nuevoEstado,callback){
+  if(nuevoEstado==='reparacion'){
+    var otrosActivos=Object.keys(activeTimers).filter(function(k){return k!==id;});
+    if(otrosActivos.length && isMobile){
+      var t=trabajos.find(function(j){return j.id===otrosActivos[0];});
+      if(t && confirm('Hay otro trabajo en marcha ('+t.matricula+'). ¿Lo ponemos en pausa?')){
+        _origCambiarEstado(otrosActivos[0],'pausa',null);
+      }
+    }
+  }
+  _origCambiarEstado(id,nuevoEstado,callback);
+};
+
+// ═══════════════════════════════════
+// VOZ A TEXTO
+// ═══════════════════════════════════
+var reconocimiento=null;
+function iniciarVoz(){
+  var btn=document.getElementById('btn-voz');
+  var textarea=document.getElementById('nota-texto');
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
+    showToast('Tu navegador no soporta voz. Usa Chrome.');
+    return;
+  }
+  if(reconocimiento){
+    reconocimiento.stop();reconocimiento=null;
+    btn.textContent='🎤 Pulsa para dictar con la voz';
+    return;
+  }
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  reconocimiento=new SR();
+  reconocimiento.lang='es-ES';
+  reconocimiento.continuous=true;
+  reconocimiento.interimResults=false;
+  btn.textContent='🔴 Escuchando... (pulsa para parar)';
+  reconocimiento.onresult=function(e){
+    var texto=Array.from(e.results).map(function(r){return r[0].transcript;}).join(' ');
+    textarea.value=(textarea.value?textarea.value+' ':'')+texto;
+  };
+  reconocimiento.onerror=function(){
+    btn.textContent='🎤 Pulsa para dictar con la voz';
+    reconocimiento=null;
+  };
+  reconocimiento.onend=function(){
+    btn.textContent='🎤 Pulsa para dictar con la voz';
+    reconocimiento=null;
+  };
+  reconocimiento.start();
+}
+
+// ═══════════════════════════════════
+// AUTO-REFRESCO
+// ═══════════════════════════════════
+var autoRefreshInterval=null;
+function iniciarAutoRefresh(){
+  if(autoRefreshInterval) clearInterval(autoRefreshInterval);
+  autoRefreshInterval=setInterval(function(){
+    if(!sesion)return;
+    // Recargar datos en segundo plano sin mostrar loading
+    Promise.all([
+      supaGet('trabajos'),
+      supaGet('horas'),
+      supaGet('notas')
+    ]).then(function(res){
+      var tNuevos=Array.isArray(res[0])?res[0]:[];
+      var hNuevas=Array.isArray(res[1])?res[1]:[];
+      var nNuevas=Array.isArray(res[2])?res[2]:[];
+      // Restaurar timers para trabajos en reparación
+      tNuevos.forEach(function(t){
+        if(t.estado==='reparacion'&&t.timer_inicio&&!activeTimers[t.id]){
+          activeTimers[t.id]=new Date(t.timer_inicio).getTime();
+        }
+        if(t.estado!=='reparacion'&&activeTimers[t.id]){
+          delete activeTimers[t.id];
+        }
+      });
+      trabajos=tNuevos;
+      horasMap={};
+      hNuevas.forEach(function(h){
+        if(!horasMap[h.trabajo_id])horasMap[h.trabajo_id]=[];
+        horasMap[h.trabajo_id].push(h);
+      });
+      notas=nNuevas;
+      // Refrescar la vista activa sin interrumpir al usuario
+      var modal=document.querySelector('.modal-overlay.open,.desk-modal-overlay.open,.mob-detalle-overlay.open');
+      if(!modal){
+        if(isMobile){
+          var pag=document.querySelector('.mob-page.active');
+          if(pag) mobShowPage(pag.id.replace('mob-page-',''));
+        } else {
+          var dpag=document.querySelector('.desk-page.active');
+          if(dpag) deskRenderPage(dpag.id.replace('desk-page-',''));
+        }
+      }
+      actualizarMultitareaBar();
+    }).catch(function(){});
+  }, 30000); // cada 30 segundos
+}
+function detenerAutoRefresh(){
+  if(autoRefreshInterval){clearInterval(autoRefreshInterval);autoRefreshInterval=null;}
+}
+
+// ═══════════════════════════════════
 // INICIO — cargar usuarios antes de mostrar login
+// ═══════════════════════════════════
 fetch(SUPA_URL+'/rest/v1/usuarios?select=*', {
   headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
 }).then(function(r){return r.json();}).then(function(us){
