@@ -735,14 +735,28 @@ function stopTimerSilente(id){
   var mins=Math.max(1,Math.round((Date.now()-st)/60000));
   delete activeTimers[id];
   var t=trabajos.find(function(j){return j.id===id;});
-  var mecKey=Object.keys(USUARIOS).find(function(k){return USUARIOS[k].nombre===(t?t.mecanico:'');});
+  if(!t)return;
+  var mecKey=Object.keys(USUARIOS).find(function(k){return USUARIOS[k].nombre===t.mecanico;});
   var costeHora=mecKey?(USUARIOS[mecKey].coste||0):0;
   var coste=parseFloat(((mins/60)*costeHora).toFixed(2));
-  var nuevaHora={trabajo_id:id, tipo:'Mano de obra', mins:mins, fecha:hoy(), coste:coste};
+  // Intentar con coste, si falla sin coste
+  var nuevaHora={trabajo_id:id, tipo:'Mano de obra', mins:mins, fecha:hoy()};
+  if(coste>0) nuevaHora.coste=coste;
   supaInsert('horas', nuevaHora).then(function(res){
     var h=res&&res[0]?res[0]:nuevaHora;
     if(!horasMap[id])horasMap[id]=[];
     horasMap[id].push(h);
+    // Refrescar vista si está visible
+    var pHoras=document.getElementById('desk-horas-content');
+    if(pHoras && pHoras.innerHTML) deskRenderHoras();
+  }).catch(function(e){
+    // Reintentar sin coste
+    delete nuevaHora.coste;
+    supaInsert('horas', nuevaHora).then(function(res){
+      var h=res&&res[0]?res[0]:nuevaHora;
+      if(!horasMap[id])horasMap[id]=[];
+      horasMap[id].push(h);
+    });
   });
 }
 // ═══════════════════════════════════
@@ -827,6 +841,10 @@ function stopTimer(id){
 function mobShowPage(id){
   document.querySelectorAll('.mob-page').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.mob-nav-btn').forEach(function(b){b.classList.remove('active');});
+  if(id!=='trabajos'){
+    var pg=document.getElementById('mob-page-trabajos');
+    if(pg)pg.innerHTML='<div class="mob-search-bar"><input id="mob-search-t" placeholder="Buscar matrícula, vehículo..." oninput="mobRenderTrabajos()"/></div><div id="mob-trabajos-lista"></div>';
+  }
   document.getElementById('mob-page-'+id).classList.add('active');
   var nb=document.getElementById('mnav-'+id);if(nb)nb.classList.add('active');
   if(id==='inicio')mobRenderInicio();
@@ -891,12 +909,16 @@ function mobRenderTrabajos(){
   var ts=misTrab().filter(function(t){
     return !q||(t.matricula+t.vehiculo+t.cliente+t.tipo).toLowerCase().indexOf(q)>=0;
   });
-  var contenedor=document.getElementById('mob-page-trabajos');
-  var buscador=contenedor.querySelector('.mob-search-bar');
-  var html='<div class="mob-section-title">Todos los trabajos ('+ts.length+')</div>'+
+  var lista=document.getElementById('mob-trabajos-lista');
+  if(!lista){
+    // Primera vez: crear estructura completa
+    document.getElementById('mob-page-trabajos').innerHTML=
+      '<div class="mob-search-bar"><input id="mob-search-t" placeholder="Buscar matrícula, vehículo..." oninput="mobRenderTrabajos()"/></div>'+
+      '<div id="mob-trabajos-lista"></div>';
+    lista=document.getElementById('mob-trabajos-lista');
+  }
+  lista.innerHTML='<div class="mob-section-title">Todos los trabajos ('+ts.length+')</div>'+
     (ts.length?ts.map(mobJobCard).join(''):'<div class="empty-state">Sin trabajos.</div>');
-  // Mantener el buscador y añadir el resto
-  contenedor.innerHTML='<div class="mob-search-bar"><input id="mob-search-t" placeholder="Buscar matrícula, vehículo..." oninput="mobRenderTrabajos()" value="'+(q||'')+'"/></div>'+html;
 }
 
 function mobRenderProceso(){
@@ -905,14 +927,15 @@ function mobRenderProceso(){
   var html='<div class="mob-kanban-scroll"><div class="mob-kanban">'+
     cols.map(function(e){
       var items=ts.filter(function(t){return t.estado===e;});
-      return '<div class="mob-kcol">'+
+      return '<div class="mob-kcol" data-estado="'+e+'">'+
         '<div class="mob-kcol-head kch-'+e+'">'+EL[e]+' ('+items.length+')</div>'+
         items.map(function(t){
-          return '<div class="mob-kitem" onclick="mobVerDetalle(\''+t.id+'\')">'+
+          return '<div class="mob-kitem" data-id="'+t.id+'" onclick="mobVerDetalle(\''+t.id+'\')">'+
             '<div class="mob-ki-mat">'+t.matricula+'</div>'+
             '<div class="mob-ki-veh">'+t.vehiculo+'</div>'+
             '<div class="mob-ki-cli">'+t.cliente+'</div>'+
             '<div class="mob-ki-bot"><span>'+t.mecanico+'</span><span>'+th(t)+'</span></div>'+
+            (activeTimers[t.id]?'<div style="margin-top:4px;font-size:10px;color:#7F77DD">⬤ Activo</div>':'')+
           '</div>';
         }).join('')+
       '</div>';
@@ -1145,11 +1168,11 @@ function deskKanbanEl(elId,ts){
   document.getElementById(elId).innerHTML=cols.map(function(e){
     var items=ts.filter(function(t){return t.estado===e;});
     var alerta=items.length>=3?' <span style="background:#FAECE7;color:#712B13;border-radius:20px;padding:1px 7px;font-size:10px">!</span>':'';
-    return '<div class="desk-kcol" id="kcol-'+elId+'-'+e+'" ondragover="event.preventDefault();this.classList.add(\'drag-over\')" ondragleave="this.classList.remove(\'drag-over\')" ondrop="dropEnEstado(event,\''+e+'\',\''+elId+'\')" >'+
+    return '<div class="desk-kcol" data-estado="'+e+'" id="kcol-'+elId+'-'+e+'" ondragover="event.preventDefault();this.classList.add(\'drag-over\')" ondragleave="this.classList.remove(\'drag-over\')" ondrop="dropEnEstado(event,\''+e+'\',\''+elId+'\')" >'+
       '<div class="desk-kcol-head kch-'+e+'">'+EL[e]+' ('+items.length+')'+alerta+'</div>'+
       '<div class="desk-kcol-drop"></div>'+
       items.map(function(t){
-        return '<div class="desk-kitem" draggable="true" ondragstart="dragId=\''+t.id+'\';this.classList.add(\'dragging\')" ondragend="this.classList.remove(\'dragging\')" onclick="deskVerDetalle(\''+t.id+'\')">'+
+        return '<div class="desk-kitem" data-id="'+t.id+'" draggable="true" ondragstart="dragId=\''+t.id+'\';this.classList.add(\'dragging\')" ondragend="this.classList.remove(\'dragging\')" onclick="deskVerDetalle(\''+t.id+'\')">'+
           '<div class="desk-ki-mat">'+t.matricula+'</div>'+
           '<div class="desk-ki-veh">'+t.vehiculo+'</div>'+
           '<div class="desk-ki-cli">'+t.cliente+'</div>'+
@@ -1484,40 +1507,109 @@ cambiarEstado=function(id,nuevoEstado,callback){
 };
 
 // ═══════════════════════════════════
-// VOZ A TEXTO
+// VOZ A TEXTO (corregido)
 // ═══════════════════════════════════
 var reconocimiento=null;
 function iniciarVoz(){
   var btn=document.getElementById('btn-voz');
   var textarea=document.getElementById('nota-texto');
-  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
-    showToast('Tu navegador no soporta voz. Usa Chrome.');
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){
+    showToast('Voz no disponible. Usa Chrome en Android.');
     return;
   }
   if(reconocimiento){
-    reconocimiento.stop();reconocimiento=null;
-    btn.textContent='🎤 Pulsa para dictar con la voz';
+    reconocimiento.stop();
     return;
   }
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   reconocimiento=new SR();
   reconocimiento.lang='es-ES';
   reconocimiento.continuous=true;
-  reconocimiento.interimResults=false;
+  reconocimiento.interimResults=true;
   btn.textContent='🔴 Escuchando... (pulsa para parar)';
+  btn.style.color='#A32D2D';
+  var baseText=textarea.value;
   reconocimiento.onresult=function(e){
-    var texto=Array.from(e.results).map(function(r){return r[0].transcript;}).join(' ');
-    textarea.value=(textarea.value?textarea.value+' ':'')+texto;
+    var interim='';
+    var final='';
+    for(var i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    textarea.value=baseText+(baseText&&(final||interim)?' ':'')+final+interim;
+    if(final) baseText=textarea.value;
   };
-  reconocimiento.onerror=function(){
-    btn.textContent='🎤 Pulsa para dictar con la voz';
+  reconocimiento.onerror=function(e){
+    showToast('Error de micrófono: '+e.error);
     reconocimiento=null;
+    btn.textContent='🎤 Pulsa para dictar con la voz';
+    btn.style.color='';
   };
   reconocimiento.onend=function(){
-    btn.textContent='🎤 Pulsa para dictar con la voz';
     reconocimiento=null;
+    btn.textContent='🎤 Pulsa para dictar con la voz';
+    btn.style.color='';
   };
   reconocimiento.start();
+}
+
+// ═══════════════════════════════════
+// TOUCH DRAG & DROP PARA MÓVIL
+// ═══════════════════════════════════
+var touchDragId=null;
+var touchDragEl=null;
+var touchClone=null;
+
+function initTouchDrag(){
+  document.addEventListener('touchstart',function(e){
+    var kitem=e.target.closest('.desk-kitem,.mob-kitem');
+    if(!kitem)return;
+    touchDragId=kitem.dataset.id;
+    if(!touchDragId)return;
+    touchDragEl=kitem;
+    touchClone=kitem.cloneNode(true);
+    touchClone.style.cssText='position:fixed;opacity:.7;pointer-events:none;z-index:9999;width:'+kitem.offsetWidth+'px;font-size:12px;background:var(--bg);border:2px solid #7F77DD;border-radius:8px;padding:10px;';
+    document.body.appendChild(touchClone);
+    kitem.style.opacity='.3';
+  },{passive:true});
+
+  document.addEventListener('touchmove',function(e){
+    if(!touchDragId||!touchClone)return;
+    var touch=e.touches[0];
+    touchClone.style.left=(touch.clientX-80)+'px';
+    touchClone.style.top=(touch.clientY-40)+'px';
+    // Resaltar columna bajo el dedo
+    document.querySelectorAll('.desk-kcol,.mob-kcol').forEach(function(c){c.classList.remove('drag-over');});
+    var el=document.elementFromPoint(touch.clientX,touch.clientY);
+    if(el){var col=el.closest('.desk-kcol,.mob-kcol');if(col)col.classList.add('drag-over');}
+  },{passive:true});
+
+  document.addEventListener('touchend',function(e){
+    if(!touchDragId)return;
+    if(touchClone){document.body.removeChild(touchClone);touchClone=null;}
+    if(touchDragEl){touchDragEl.style.opacity='';touchDragEl=null;}
+    var touch=e.changedTouches[0];
+    var el=document.elementFromPoint(touch.clientX,touch.clientY);
+    document.querySelectorAll('.desk-kcol,.mob-kcol').forEach(function(c){c.classList.remove('drag-over');});
+    if(el){
+      var col=el.closest('[data-estado]');
+      if(!col){
+        // Buscar columna por head text
+        var head=el.closest('.desk-kcol,.mob-kcol');
+        if(head) col=head;
+      }
+      if(col){
+        var estado=col.dataset.estado;
+        if(estado&&estado!==((trabajos.find(function(t){return t.id===touchDragId;})||{}).estado)){
+          cambiarEstado(touchDragId,estado,function(){
+            deskRenderKanbanFull();
+            mobRenderProceso();
+          });
+        }
+      }
+    }
+    touchDragId=null;
+  });
 }
 
 // ═══════════════════════════════════
@@ -1575,6 +1667,7 @@ function detenerAutoRefresh(){
 // ═══════════════════════════════════
 // INICIO — cargar usuarios antes de mostrar login
 // ═══════════════════════════════════
+initTouchDrag();
 fetch(SUPA_URL+'/rest/v1/usuarios?select=*', {
   headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
 }).then(function(r){return r.json();}).then(function(us){
