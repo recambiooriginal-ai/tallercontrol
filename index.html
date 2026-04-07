@@ -511,7 +511,9 @@ function supa(path, opts){
   }, opts)).then(function(r){return r.json();});
 }
 function supaGet(table, select){
-  return supa(table+'?select='+(select||'*')+'&order=created_at.desc');
+  var noOrder=['horas','usuarios'];
+  var order=noOrder.indexOf(table)>=0?'':'&order=created_at.desc';
+  return supa(table+'?select='+(select||'*')+order);
 }
 function supaInsert(table, data){
   return supa(table, {method:'POST', body:JSON.stringify(data)});
@@ -543,6 +545,10 @@ var activeTimers = {};
 function th(t){
   var hs = horasMap[t.id]||[];
   var m = hs.reduce(function(s,e){return s+e.mins;},0);
+  // Añadir tiempo del cronómetro activo si está en marcha
+  if(activeTimers[t.id]){
+    m += Math.round((Date.now()-activeTimers[t.id])/60000);
+  }
   return Math.floor(m/60)+'h '+(m%60)+'m';
 }
 function badge(e){return '<span class="badge b-'+e+'">'+EL[e]+'</span>';}
@@ -1618,9 +1624,26 @@ function initTouchDrag(){
 var autoRefreshInterval=null;
 function iniciarAutoRefresh(){
   if(autoRefreshInterval) clearInterval(autoRefreshInterval);
+  // Refresco visual cada minuto para actualizar cronómetros en pantalla
+  var timerDisplayInterval=setInterval(function(){
+    if(!sesion)return;
+    if(Object.keys(activeTimers).length===0)return;
+    var modal=document.querySelector('.modal-overlay.open,.desk-modal-overlay.open,.mob-detalle-overlay.open');
+    if(!modal){
+      if(isMobile){
+        var pag=document.querySelector('.mob-page.active');
+        if(pag){var pid=pag.id.replace('mob-page-','');if(pid==='inicio'||pid==='horas')mobRenderInicio();}
+      } else {
+        var dpag=document.querySelector('.desk-page.active');
+        if(dpag){var did=dpag.id.replace('desk-page-','');if(did==='dashboard'||did==='horas')deskRenderDashboard();}
+      }
+    }
+    actualizarMultitareaBar();
+  }, 60000);
+
+  // Refresco de datos desde Supabase cada 30 segundos
   autoRefreshInterval=setInterval(function(){
     if(!sesion)return;
-    // Recargar datos en segundo plano sin mostrar loading
     Promise.all([
       supaGet('trabajos'),
       supaGet('horas'),
@@ -1629,7 +1652,6 @@ function iniciarAutoRefresh(){
       var tNuevos=Array.isArray(res[0])?res[0]:[];
       var hNuevas=Array.isArray(res[1])?res[1]:[];
       var nNuevas=Array.isArray(res[2])?res[2]:[];
-      // Restaurar timers para trabajos en reparación
       tNuevos.forEach(function(t){
         if(t.estado==='reparacion'&&t.timer_inicio&&!activeTimers[t.id]){
           activeTimers[t.id]=new Date(t.timer_inicio).getTime();
@@ -1645,7 +1667,6 @@ function iniciarAutoRefresh(){
         horasMap[h.trabajo_id].push(h);
       });
       notas=nNuevas;
-      // Refrescar la vista activa sin interrumpir al usuario
       var modal=document.querySelector('.modal-overlay.open,.desk-modal-overlay.open,.mob-detalle-overlay.open');
       if(!modal){
         if(isMobile){
@@ -1658,7 +1679,7 @@ function iniciarAutoRefresh(){
       }
       actualizarMultitareaBar();
     }).catch(function(){});
-  }, 30000); // cada 30 segundos
+  }, 30000);
 }
 function detenerAutoRefresh(){
   if(autoRefreshInterval){clearInterval(autoRefreshInterval);autoRefreshInterval=null;}
