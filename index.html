@@ -629,6 +629,11 @@ function doLogin(){
   var p=document.getElementById('l-pass').value;
   var usr=USUARIOS[u];
   if(usr&&usr.pass===p){
+    if(usr.bloqueado){
+      document.getElementById('err-msg').textContent='Este usuario está bloqueado. Contacta con el administrador.';
+      document.getElementById('err-msg').style.display='block';
+      return;
+    }
     sesion={key:u,rol:usr.rol,nombre:usr.nombre};
     document.getElementById('screen-login').classList.remove('active');
     cargarDatos().then(function(){
@@ -652,6 +657,7 @@ function doLogin(){
       iniciarAutoRefresh();
     });
   } else {
+    document.getElementById('err-msg').textContent='Usuario o contraseña incorrectos.';
     document.getElementById('err-msg').style.display='block';
   }
 }
@@ -1326,11 +1332,11 @@ function deskRenderMecanicos(){
     var mt=trabajos.filter(function(t){return t.mecanico===m.nombre;});
     var act=mt.filter(function(t){return t.estado!=='completado';}).length;
     var mins=mt.reduce(function(s,t){return s+(horasMap[t.id]||[]).reduce(function(a,e){return a+e.mins;},0);},0);
-    var horas=mins/60;
-    var costeTotal=(horas*(m.coste||0));
+    var costeTotal=((mins/60)*(m.coste||0));
     var fac=mt.reduce(function(s,t){return s+(t.precio||0);},0);
-    return '<tr>'+
-      '<td><strong>'+m.nombre+'</strong></td>'+
+    var bloqueado=m.bloqueado;
+    return '<tr style="'+(bloqueado?'opacity:.5':'')+'">'+
+      '<td><strong>'+m.nombre+'</strong>'+(bloqueado?' <span style="font-size:10px;background:#FAECE7;color:#712B13;padding:2px 7px;border-radius:20px">Bloqueado</span>':'')+'</td>'+
       '<td style="color:var(--text2)">'+m.key+'</td>'+
       '<td>'+m.esp+'</td>'+
       '<td><strong>'+(m.coste||0)+'€/h</strong></td>'+
@@ -1341,6 +1347,10 @@ function deskRenderMecanicos(){
       '<td>'+
         '<a class="act-link" onclick="editarUsuario(\''+m.key+'\')">Editar</a>'+
         '<a class="act-link" onclick="abrirCambiarPass(\''+m.key+'\')">Contraseña</a>'+
+        '<a class="act-link" style="color:'+(bloqueado?'#1D9E75':'#BA7517')+'" onclick="toggleBloqueo(\''+m.key+'\')">'+
+          (bloqueado?'Desbloquear':'Bloquear')+
+        '</a>'+
+        '<a class="act-link" style="color:#A32D2D" onclick="borrarUsuario(\''+m.key+'\',\''+m.nombre+'\')">Borrar</a>'+
       '</td>'+
     '</tr>';
   }).join('');
@@ -1407,6 +1417,30 @@ function finalizarGuardarUsuario(editKey,btn){
   showToast(editKey?'Mecánico actualizado ✓':'Mecánico creado ✓');
   deskRenderMecanicos();
   actualizarSelectMecanicos();
+}
+
+function toggleBloqueo(key){
+  var u=USUARIOS[key];
+  if(!u)return;
+  var nuevoBloqueado=!u.bloqueado;
+  var msg=nuevoBloqueado?'¿Bloquear a '+u.nombre+'? No podrá entrar a la aplicación.':'¿Desbloquear a '+u.nombre+'?';
+  if(!confirm(msg))return;
+  supa('usuarios?key=eq.'+key,{method:'PATCH',body:JSON.stringify({bloqueado:nuevoBloqueado})}).then(function(){
+    USUARIOS[key].bloqueado=nuevoBloqueado;
+    showToast(nuevoBloqueado?u.nombre+' bloqueado ✓':u.nombre+' desbloqueado ✓');
+    deskRenderMecanicos();
+  }).catch(function(){showToast('Error al actualizar');});
+}
+
+function borrarUsuario(key, nombre){
+  if(!confirm('¿Borrar a '+nombre+'? Esta acción no se puede deshacer.\n\nSus trabajos e historial de horas se conservarán.'))return;
+  if(!confirm('Confirmación final: ¿seguro que quieres borrar a '+nombre+'?'))return;
+  supa('usuarios?key=eq.'+key,{method:'DELETE'}).then(function(){
+    delete USUARIOS[key];
+    showToast(nombre+' eliminado ✓');
+    deskRenderMecanicos();
+    actualizarSelectMecanicos();
+  }).catch(function(){showToast('Error al borrar');});
 }
 
 function abrirCambiarPass(key){
