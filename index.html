@@ -557,7 +557,18 @@ function genId(){return 'T-'+Date.now().toString(36).toUpperCase();}
 function genNotaId(){return 'N-'+Date.now().toString(36).toUpperCase();}
 function misTrab(){
   if(!sesion)return[];
-  return sesion.rol==='admin'?trabajos:trabajos.filter(function(t){return t.mecanico===sesion.nombre;});
+  if(sesion.rol==='admin')return trabajos;
+  // Mecánico ve trabajos donde tiene horas registradas O cronómetro activo
+  return trabajos.filter(function(t){
+    if(activeTimers[t.id])return true;
+    var hs=horasMap[t.id]||[];
+    return hs.some(function(h){return h.mecanico===sesion.nombre||h.mec===sesion.nombre;});
+  });
+}
+
+// Todos los trabajos activos (para que mecánico pueda unirse)
+function todosActivos(){
+  return trabajos.filter(function(t){return t.estado!=='completado';});
 }
 function showToast(msg){
   var t=document.getElementById('toast');
@@ -742,21 +753,19 @@ function stopTimerSilente(id){
   delete activeTimers[id];
   var t=trabajos.find(function(j){return j.id===id;});
   if(!t)return;
-  var mecKey=Object.keys(USUARIOS).find(function(k){return USUARIOS[k].nombre===t.mecanico;});
+  var mecNombre=sesion?sesion.nombre:t.mecanico;
+  var mecKey=Object.keys(USUARIOS).find(function(k){return USUARIOS[k].nombre===mecNombre;});
   var costeHora=mecKey?(USUARIOS[mecKey].coste||0):0;
   var coste=parseFloat(((mins/60)*costeHora).toFixed(2));
-  // Intentar con coste, si falla sin coste
-  var nuevaHora={trabajo_id:id, tipo:'Mano de obra', mins:mins, fecha:hoy()};
+  var nuevaHora={trabajo_id:id, tipo:'Mano de obra', mins:mins, fecha:hoy(), mecanico:mecNombre};
   if(coste>0) nuevaHora.coste=coste;
   supaInsert('horas', nuevaHora).then(function(res){
     var h=res&&res[0]?res[0]:nuevaHora;
     if(!horasMap[id])horasMap[id]=[];
     horasMap[id].push(h);
-    // Refrescar vista si está visible
     var pHoras=document.getElementById('desk-horas-content');
-    if(pHoras && pHoras.innerHTML) deskRenderHoras();
-  }).catch(function(e){
-    // Reintentar sin coste
+    if(pHoras&&pHoras.innerHTML) deskRenderHoras();
+  }).catch(function(){
     delete nuevaHora.coste;
     supaInsert('horas', nuevaHora).then(function(res){
       var h=res&&res[0]?res[0]:nuevaHora;
@@ -827,11 +836,11 @@ function stopTimer(id){
   var st=activeTimers[id];if(!st)return;
   var mins=Math.max(1,Math.round((Date.now()-st)/60000));
   delete activeTimers[id];
-  var t=trabajos.find(function(j){return j.id===id;});
-  var mecKey=Object.keys(USUARIOS).find(function(k){return USUARIOS[k].nombre===(t?t.mecanico:'');});
+  var mecNombre=sesion?sesion.nombre:'';
+  var mecKey=Object.keys(USUARIOS).find(function(k){return USUARIOS[k].nombre===mecNombre;});
   var costeHora=mecKey?(USUARIOS[mecKey].coste||0):0;
   var coste=parseFloat(((mins/60)*costeHora).toFixed(2));
-  var nuevaHora={trabajo_id:id, tipo:'Mano de obra', mins:mins, fecha:hoy(), coste:coste};
+  var nuevaHora={trabajo_id:id, tipo:'Mano de obra', mins:mins, fecha:hoy(), mecanico:mecNombre, coste:coste};
   supaInsert('horas', nuevaHora).then(function(res){
     var h=res&&res[0]?res[0]:nuevaHora;
     if(!horasMap[id])horasMap[id]=[];
@@ -951,25 +960,53 @@ function mobRenderProceso(){
 }
 
 function mobRenderHoras(){
-  var ts=misTrab();
+  var misTrabAct=misTrab(); // trabajos donde ya he registrado horas
+  var todosAct=trabajos.filter(function(t){return t.estado!=='completado';}); // todos para unirse
   var html='';
-  ts.forEach(function(t){
-    var hs=horasMap[t.id]||[];
-    var mins=hs.reduce(function(s,e){return s+e.mins;},0);
-    var isActive=activeTimers[t.id];
-    html+='<div class="mob-hora-card">'+
-      '<div class="mob-hora-top">'+
-        '<div><div class="mob-hora-name">'+t.matricula+' — '+t.vehiculo+'</div><div style="font-size:12px;color:var(--text2)">'+t.cliente+' · '+t.mecanico+'</div></div>'+
-        '<div><div class="mob-hora-total">'+Math.floor(mins/60)+'h '+(mins%60)+'m</div><div style="font-size:11px;color:var(--text3);text-align:right">total</div></div>'+
-      '</div>'+
-      (hs.length?'<div class="mob-hora-entries">'+hs.map(function(e){return '<div class="mob-hora-entry"><span>'+e.tipo+'</span><span>'+Math.floor(e.mins/60)+'h '+(e.mins%60)+'m</span><span>'+e.fecha+'</span></div>';}).join('')+'</div>':'')+
-      (isActive
-        ?'<div class="mob-timer-active"><span class="timer-dot"></span>Cronómetro activo...<button class="mob-timer-stop" onclick="stopTimer(\''+t.id+'\')">Detener</button></div>'
-        :'<button class="mob-timer-btn" onclick="startTimer(\''+t.id+'\')">▶ Iniciar cronómetro</button>'
-      )+
-    '</div>';
+
+  // Mis trabajos activos
+  if(misTrabAct.length){
+    html+='<div class="mob-section-title">Mis trabajos</div>';
+    misTrabAct.forEach(function(t){
+      var hs=(horasMap[t.id]||[]).filter(function(h){return h.mecanico===sesion.nombre||!h.mecanico;});
+      var mins=hs.reduce(function(s,e){return s+e.mins;},0);
+      if(activeTimers[t.id]) mins+=Math.round((Date.now()-activeTimers[t.id])/60000);
+      var isActive=!!activeTimers[t.id];
+      html+='<div class="mob-hora-card">'+
+        '<div class="mob-hora-top">'+
+          '<div><div class="mob-hora-name">'+t.matricula+' — '+t.vehiculo+'</div>'+
+          '<div style="font-size:12px;color:var(--text2)">'+t.cliente+'</div></div>'+
+          '<div><div class="mob-hora-total">'+Math.floor(mins/60)+'h '+(mins%60)+'m</div>'+
+          '<div style="font-size:11px;color:var(--text3);text-align:right">mis horas</div></div>'+
+        '</div>'+
+        (hs.length?'<div class="mob-hora-entries">'+hs.map(function(e){return '<div class="mob-hora-entry"><span>'+e.tipo+'</span><span>'+Math.floor(e.mins/60)+'h '+(e.mins%60)+'m</span><span>'+e.fecha+'</span></div>';}).join('')+'</div>':'')+
+        (isActive
+          ?'<div class="mob-timer-active"><span class="timer-dot"></span>Cronómetro activo — '+Math.floor(mins/60)+'h '+(mins%60)+'m<button class="mob-timer-stop" onclick="stopTimer(\''+t.id+'\')">Detener</button></div>'
+          :(t.estado==='reparacion'?'<button class="mob-timer-btn" onclick="startTimer(\''+t.id+'\')">▶ Iniciar mi cronómetro</button>':'')
+        )+
+      '</div>';
+    });
+  }
+
+  // Todos los trabajos activos para unirse
+  var sinMis=todosAct.filter(function(t){
+    return !misTrabAct.find(function(m){return m.id===t.id;})&&!activeTimers[t.id];
   });
-  document.getElementById('mob-page-horas').innerHTML=html||'<div class="empty-state">Sin trabajos.</div>';
+  if(sinMis.length){
+    html+='<div class="mob-section-title">Unirse a un trabajo</div>';
+    sinMis.forEach(function(t){
+      html+='<div class="mob-hora-card" style="opacity:.85">'+
+        '<div class="mob-hora-top">'+
+          '<div><div class="mob-hora-name">'+t.matricula+' — '+t.vehiculo+'</div>'+
+          '<div style="font-size:12px;color:var(--text2)">'+t.cliente+' · '+badge(t.estado)+'</div></div>'+
+          '<div style="font-size:12px;color:var(--text2)">'+t.mecanico+'</div>'+
+        '</div>'+
+        (t.estado==='reparacion'||t.estado==='pausa'?'<button class="mob-timer-btn" onclick="startTimer(\''+t.id+'\')">▶ Unirme y arrancar cronómetro</button>':'<div style="font-size:12px;color:var(--text3);margin-top:8px;text-align:center">Estado: '+EL[t.estado]+'</div>')+
+      '</div>';
+    });
+  }
+
+  document.getElementById('mob-page-horas').innerHTML=html||'<div class="empty-state">Sin trabajos activos.</div>';
   actualizarMultitareaBar();
 }
 
@@ -1204,28 +1241,37 @@ function dropEnEstado(event,nuevoEstado,elId){
 function deskRenderKanbanFull(){deskKanbanEl('desk-kanban-full',misTrab());}
 
 function deskRenderHoras(){
-  var ts=misTrab(),html='';
   var isAdmin=sesion.rol==='admin';
-  var header=isAdmin
-    ?'<th>Mecánico</th><th>Matrícula</th><th>Vehículo</th><th>Tarea</th><th>Horas</th><th>€/hora</th><th>Coste M.O.</th><th>Fecha</th>'
-    :'<th>Matrícula</th><th>Vehículo</th><th>Tarea</th><th>Horas</th><th>Fecha</th>';
-  var totalMins=0, totalCoste=0;
-  html='<div class="desk-card"><div class="tbl-wrap"><table><thead><tr>'+header+'</tr></thead><tbody>';
-  var rows='';
-  ts.forEach(function(t){
-    var mecKey=Object.keys(USUARIOS).find(function(k){return USUARIOS[k].nombre===t.mecanico;});
-    var costeHora=mecKey?(USUARIOS[mecKey].coste||0):0;
+  // Admin ve todas las horas; mecánico ve solo las suyas
+  var todasHoras=[];
+  trabajos.forEach(function(t){
     (horasMap[t.id]||[]).forEach(function(e){
-      totalMins+=e.mins;
-      var costeEntry=e.coste!=null?e.coste:parseFloat(((e.mins/60)*costeHora).toFixed(2));
-      totalCoste+=costeEntry;
-      rows+=isAdmin
-        ?'<tr><td>'+t.mecanico+'</td><td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td><td>'+e.tipo+'</td><td>'+Math.floor(e.mins/60)+'h '+(e.mins%60)+'m</td><td>'+costeHora+'€/h</td><td style="color:#185FA5"><strong>'+costeEntry.toFixed(0)+'€</strong></td><td>'+e.fecha+'</td></tr>'
-        :'<tr><td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td><td>'+e.tipo+'</td><td>'+Math.floor(e.mins/60)+'h '+(e.mins%60)+'m</td><td>'+e.fecha+'</td></tr>';
+      todasHoras.push({t:t,e:e});
     });
   });
-  html+=(rows||'<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:20px">Sin horas registradas</td></tr>')+'</tbody></table></div></div>';
-  if(isAdmin && rows){
+  if(!isAdmin){
+    todasHoras=todasHoras.filter(function(x){return x.e.mecanico===sesion.nombre||(!x.e.mecanico&&x.t.mecanico===sesion.nombre);});
+  }
+  var header=isAdmin
+    ?'<th>Mecánico</th><th>Matrícula</th><th>Vehículo</th><th>Tarea</th><th>Horas</th><th>€/hora</th><th>Coste M.O.</th><th>Fecha</th>'
+    :'<th>Matrícula</th><th>Vehículo</th><th>Tarea</th><th>Horas</th><th>Coste</th><th>Fecha</th>';
+  var totalMins=0,totalCoste=0;
+  var rows='';
+  todasHoras.forEach(function(x){
+    var t=x.t,e=x.e;
+    var mecNombre=e.mecanico||t.mecanico||'—';
+    var mecKey=Object.keys(USUARIOS).find(function(k){return USUARIOS[k].nombre===mecNombre;});
+    var costeHora=mecKey?(USUARIOS[mecKey].coste||0):0;
+    var costeEntry=e.coste!=null?e.coste:parseFloat(((e.mins/60)*costeHora).toFixed(2));
+    totalMins+=e.mins;totalCoste+=costeEntry;
+    rows+=isAdmin
+      ?'<tr><td>'+mecNombre+'</td><td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td><td>'+e.tipo+'</td><td>'+Math.floor(e.mins/60)+'h '+(e.mins%60)+'m</td><td>'+costeHora+'€/h</td><td style="color:#185FA5"><strong>'+costeEntry.toFixed(0)+'€</strong></td><td>'+e.fecha+'</td></tr>'
+      :'<tr><td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td><td>'+e.tipo+'</td><td>'+Math.floor(e.mins/60)+'h '+(e.mins%60)+'m</td><td style="color:#185FA5">'+costeEntry.toFixed(0)+'€</td><td>'+e.fecha+'</td></tr>';
+  });
+  var html='<div class="desk-card"><div class="tbl-wrap"><table><thead><tr>'+header+'</tr></thead><tbody>'+
+    (rows||'<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:20px">Sin horas registradas</td></tr>')+
+    '</tbody></table></div></div>';
+  if(rows){
     html+='<div class="desk-card" style="display:flex;gap:24px;align-items:center">'+
       '<div><div style="font-size:12px;color:var(--text2)">Total horas</div><div style="font-size:22px;font-weight:500">'+Math.floor(totalMins/60)+'h '+(totalMins%60)+'m</div></div>'+
       '<div style="width:1px;height:40px;background:var(--border)"></div>'+
