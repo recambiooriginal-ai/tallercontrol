@@ -561,11 +561,9 @@ function genNotaId(){return 'N-'+Date.now().toString(36).toUpperCase();}
 function misTrab(){
   if(!sesion)return[];
   if(sesion.rol==='admin')return trabajos;
-  // Mecánico ve trabajos donde tiene horas registradas O cronómetro activo
+  // Mecánico ve trabajos que tiene asignados por nombre
   return trabajos.filter(function(t){
-    if(activeTimers[t.id])return true;
-    var hs=horasMap[t.id]||[];
-    return hs.some(function(h){return h.mecanico===sesion.nombre||h.mec===sesion.nombre;});
+    return t.mecanico===sesion.nombre;
   });
 }
 
