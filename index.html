@@ -760,11 +760,12 @@ function cambiarEstado(id, nuevoEstado, callback){
     } else if(nuevoEstado==='entrega'){
       t.timer_inicio=null;
       showToast('Listo para entregar ✓');
-      // Mostrar botón WhatsApp si hay teléfono
       if(t.tel && t.tel!=='—'){
         setTimeout(function(){mostrarWhatsApp(t);}, 500);
       }
     } else {
+      showToast('Estado actualizado ✓');
+    }
     if(callback)callback();
     else if(isMobile)mobShowPage('inicio');
     else deskRenderPage(document.querySelector('.desk-page.active').id.replace('desk-page-',''));
