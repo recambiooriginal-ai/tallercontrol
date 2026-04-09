@@ -1131,7 +1131,9 @@ function mobVerDetalle(id){
     '</div>'+
     botonesHtml+
     (t.estado==='entrega'&&t.tel&&t.tel!=='—'?
-      '<button onclick="mostrarWhatsApp(trabajos.find(function(j){return j.id===\''+t.id+'\'}))" style="width:100%;padding:12px;background:#25D366;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:500;margin-top:8px">📲 Enviar WhatsApp al cliente</button>':'')++
+      '<button onclick="mostrarWhatsApp(trabajos.find(function(j){return j.id===\''+t.id+'\'}))" style="width:100%;padding:12px;background:#25D366;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:500;margin-top:8px">📲 Enviar WhatsApp al cliente</button>':'')+
+    '<div style="margin-top:16px;">'+
+      '<div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:8px">Notas y fotografías ('+nt.length+')</div>'+
       nt.map(function(n){
         return '<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;">'+
           '<div style="display:flex;justify-content:space-between;margin-bottom:6px;">'+
