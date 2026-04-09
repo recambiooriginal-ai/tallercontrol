@@ -688,7 +688,9 @@ function crearTrabajo(){
     tel:document.getElementById('nw-tel').value||'—',
     vehiculo:veh, matricula:mat,
     tipo:document.getElementById('nw-tipo').value,
-    mecanico:document.getElementById('nw-mec').value,
+    mecanico: sesion.rol==='admin'
+      ? document.getElementById('nw-mec').value
+      : sesion.nombre,
     estado:'recepcion',
     urgente:document.getElementById('nw-urg').value==='si',
     precio:parseFloat(document.getElementById('nw-precio').value)||0,
@@ -1546,6 +1548,21 @@ function closeDesktopDetalle(){document.getElementById('desk-modal-detalle').cla
 
 // MODALES
 function openModal(id){
+  if(id==='modal-nuevo'){
+    var selectWrap=document.getElementById('fg-mecanico-select');
+    var fixedWrap=document.getElementById('fg-mecanico-fixed');
+    if(sesion&&sesion.rol==='admin'){
+      // Admin ve el selector con todos los mecánicos
+      selectWrap.style.display='flex';
+      fixedWrap.style.display='none';
+      actualizarSelectMecanicos();
+    } else {
+      // Mecánico ve su nombre fijo
+      selectWrap.style.display='none';
+      fixedWrap.style.display='flex';
+      document.getElementById('nw-mec-fixed').value=sesion?sesion.nombre:'';
+    }
+  }
   if(id==='modal-nuevo-nota'){
     var sel=document.getElementById('nota-job');
     sel.innerHTML=misTrab().map(function(t){return '<option value="'+t.id+'">'+t.matricula+' — '+t.vehiculo+' ('+t.cliente+')</option>';}).join('');
