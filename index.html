@@ -392,7 +392,10 @@ tbody tr:hover td{background:var(--bg2);}
       </div>
       <div id="desk-notas-content"></div>
     </div>
-    <div class="desk-page" id="desk-page-mecanicos">
+    <div class="desk-page" id="desk-page-presupuestos">
+      <div class="desk-page-header"><div class="desk-page-title">Presupuestos</div></div>
+      <div id="desk-pres-content"></div>
+    </div>
       <div class="desk-page-header">
         <div class="desk-page-title">Mecánicos</div>
         <button class="desk-btn-add" onclick="openModal('modal-usuario')">+ Nuevo mecánico</button>
@@ -611,6 +614,7 @@ var isMobile = window.innerWidth < 768;
 var trabajos = [];
 var horasMap = {};
 var notas = [];
+var presupuestos = [];
 var activeTimers = {};
 
 // ═══════════════════════════════════
@@ -662,7 +666,8 @@ function cargarDatos(){
     supaGet('trabajos'),
     supaGet('horas'),
     supaGet('notas'),
-    supaGet('usuarios')
+    supaGet('usuarios'),
+    supaGet('presupuestos')
   ]).then(function(res){
     trabajos = Array.isArray(res[0]) ? res[0] : [];
     var hs = Array.isArray(res[1]) ? res[1] : [];
@@ -675,6 +680,7 @@ function cargarDatos(){
     var us = Array.isArray(res[3]) ? res[3] : [];
     USUARIOS = {};
     us.forEach(function(u){ USUARIOS[u.key] = u; });
+    presupuestos = Array.isArray(res[4]) ? res[4] : [];
     // Restaurar cronómetros activos desde Supabase
     activeTimers = {};
     trabajos.forEach(function(t){
@@ -1209,7 +1215,7 @@ function closeMobDetalle(){document.getElementById('mob-detalle-overlay').classL
 // ═══════════════════════════════════
 // ESCRITORIO — NAVEGACIÓN
 // ═══════════════════════════════════
-var NAV_ADMIN=[{id:'dashboard',label:'Dashboard'},{id:'trabajos',label:'Trabajos'},{id:'kanban',label:'Proceso (Kanban)'},{id:'horas',label:'Control de horas'},{id:'facturacion',label:'Facturación'},{id:'notas',label:'Notas y presupuestos'},{id:'mecanicos',label:'Mecánicos'}];
+var NAV_ADMIN=[{id:'dashboard',label:'Dashboard'},{id:'trabajos',label:'Trabajos'},{id:'kanban',label:'Proceso (Kanban)'},{id:'horas',label:'Control de horas'},{id:'facturacion',label:'Facturación'},{id:'presupuestos',label:'Presupuestos'},{id:'notas',label:'Notas y presupuestos'},{id:'mecanicos',label:'Mecánicos'}];
 var NAV_MEC=[{id:'dashboard',label:'Mis trabajos'},{id:'kanban',label:'Proceso'},{id:'horas',label:'Mis horas'},{id:'notas',label:'Notas y presupuestos'}];
 
 function deskBuildSidebar(){
@@ -1232,6 +1238,7 @@ function deskRenderPage(id){
   else if(id==='horas')deskRenderHoras();
   else if(id==='facturacion')deskRenderFac();
   else if(id==='notas')deskRenderNotas();
+  else if(id==='presupuestos')deskRenderPresupuestos();
   else if(id==='mecanicos')deskRenderMecanicos();
 }
 
@@ -1403,6 +1410,65 @@ function deskRenderNotas(){
     '</div>';
   });
   document.getElementById('desk-notas-content').innerHTML=html;
+}
+
+function deskRenderPresupuestos(){
+  var el=document.getElementById('desk-pres-content');
+  if(!presupuestos.length){
+    el.innerHTML='<div class="empty-state">Sin presupuestos generados todavía.<br>Abre el detalle de un trabajo y pulsa "📄 Generar presupuesto".</div>';
+    return;
+  }
+  var html='<div class="desk-card"><div class="tbl-wrap"><table><thead><tr>'+
+    '<th>Nº</th><th>Fecha</th><th>Matrícula</th><th>Vehículo</th><th>Cliente</th><th>Descripción</th><th>Total</th><th>Acciones</th>'+
+    '</tr></thead><tbody>';
+  presupuestos.forEach(function(p){
+    var t=trabajos.find(function(j){return j.id===p.trabajo_id;})||{matricula:'—',vehiculo:'—',cliente:'—',tel:'—'};
+    var totalFmt=(p.total||0).toLocaleString('es-ES',{minimumFractionDigits:2})+'€';
+    html+='<tr>'+
+      '<td><strong>'+p.numero+'</strong></td>'+
+      '<td>'+p.fecha+'</td>'+
+      '<td><strong>'+t.matricula+'</strong></td>'+
+      '<td>'+t.vehiculo+'</td>'+
+      '<td>'+t.cliente+'</td>'+
+      '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+p.descripcion+'</td>'+
+      '<td style="font-weight:500;color:#185FA5">'+totalFmt+'</td>'+
+      '<td>'+
+        '<a class="act-link" onclick="reimprimir(\''+p.id+'\')">PDF</a>'+
+        (t.tel&&t.tel!=='—'?'<a class="act-link" style="color:#25D366" onclick="waPresupuesto(\''+p.id+'\')">WhatsApp</a>':'')+
+      '</td>'+
+    '</tr>';
+  });
+  html+='</tbody></table></div></div>';
+  el.innerHTML=html;
+}
+
+function waPresupuesto(presId){
+  var p=presupuestos.find(function(x){return x.id===presId;});
+  if(!p)return;
+  var t=trabajos.find(function(j){return j.id===p.trabajo_id;})||{};
+  ultimoPresupuestoNumero=p.numero;
+  ultimoPresupuestoTotal=(p.total||0).toLocaleString('es-ES',{minimumFractionDigits:2})+'€';
+  ultimoPresupuestoDesc=p.descripcion;
+  ultimoPresupuestoTrabajo=t;
+  mostrarWhatsAppPresupuesto();
+}
+
+function reimprimir(presId){
+  var p=presupuestos.find(function(x){return x.id===presId;});
+  if(!p)return;
+  var t=trabajos.find(function(j){return j.id===p.trabajo_id;})||{matricula:'—',vehiculo:'—',cliente:'—',tel:'—'};
+  // Restaurar estado del presupuesto y regenerar
+  presTrabajoId=p.trabajo_id;
+  try{ presLineas=JSON.parse(p.lineas)||[]; }catch(e){ presLineas=[]; }
+  document.getElementById('pres-descripcion').value=p.descripcion||'';
+  document.getElementById('pres-manoobra').value=p.mano_obra||0;
+  document.getElementById('pres-iva').value=p.iva||21;
+  // Redibujar lineas
+  document.getElementById('pres-lineas').innerHTML='';
+  var tmp=presLineas.slice(); presLineas=[];
+  tmp.forEach(function(l){addLineaPresupuesto(l.desc,l.qty,l.precio);});
+  calcularTotalPres();
+  generarPDF();
 }
 
 function deskRenderMecanicos(){
@@ -1867,36 +1933,68 @@ function generarPDF(){
 
   // Abrir en nueva ventana e imprimir como PDF
   var win = window.open('','_blank','width=900,height=700');
+  // Abrir ventana de impresión
   win.document.write(html);
   win.document.close();
-  win.onload = function(){
-    win.focus();
-    setTimeout(function(){
-      win.print();
-    }, 500);
-  };
-
-  // Guardar referencia para compartir por WhatsApp
-  ultimoPresupuestoHTML = html;
-  ultimoPresupuestoTotal = fmt(total);
-  ultimoPresupuestoTrabajo = t;
+  win.focus();
+  setTimeout(function(){ win.print(); }, 600);
 
   closeModal('modal-presupuesto');
 
-  // Ofrecer envío por WhatsApp si hay teléfono
+  // Guardar presupuesto en Supabase
+  var presData = {
+    id: numPres,
+    trabajo_id: presTrabajoId,
+    numero: numPres,
+    descripcion: desc,
+    lineas: JSON.stringify(presLineas),
+    mano_obra: mo,
+    iva: ivaPct,
+    total: total,
+    fecha: fecha
+  };
+  supaInsert('presupuestos', presData).then(function(){
+    showToast('Presupuesto guardado ✓');
+  }).catch(function(){
+    showToast('PDF generado (no se pudo guardar en BD)');
+  });
+
+  // Botón WhatsApp en el detalle del trabajo
+  ultimoPresupuestoNumero = numPres;
+  ultimoPresupuestoTotal = fmt(total);
+  ultimoPresupuestoDesc = desc;
+  ultimoPresupuestoTrabajo = t;
+
+  // Mostrar modal WhatsApp presupuesto si hay teléfono
   if(t.tel && t.tel!=='—'){
     setTimeout(function(){
-      if(confirm('¿Enviar el presupuesto al cliente por WhatsApp?')){
-        var msg = 'Hola '+t.cliente.split(' ')[0]+', le enviamos el presupuesto para su vehículo '+
-          t.matricula+' ('+t.vehiculo+').\n\nPresupuesto: '+numPres+'\nTrabajo: '+desc+'\nTotal: '+fmt(total)+'\n\nContacto: '+window.open('https://wa.me/'+tel+'?text='+encodeURIComponent(msg),'_blank');
-      }
-    },1000);
+      mostrarWhatsAppPresupuesto();
+    }, 1200);
   }
 }
 
-var ultimoPresupuestoHTML = '';
+var ultimoPresupuestoNumero = '';
 var ultimoPresupuestoTotal = '';
+var ultimoPresupuestoDesc = '';
 var ultimoPresupuestoTrabajo = null;
+
+function mostrarWhatsAppPresupuesto(){
+  var t = ultimoPresupuestoTrabajo;
+  if(!t) return;
+  var nombre = t.cliente&&t.cliente!=='—'?t.cliente.split(' ')[0]:'cliente';
+  var msg = 'Hola '+nombre+', le enviamos el presupuesto para su vehículo '+
+    t.matricula+' ('+t.vehiculo+').\n\n'+
+    'Nº Presupuesto: '+ultimoPresupuestoNumero+'\n'+
+    'Trabajo: '+ultimoPresupuestoDesc+'\n'+
+    'Total: '+ultimoPresupuestoTotal+'\n\n'+
+    'Para cualquier consulta estamos a su disposición.\n'+
+    TALLER.nombre+' · '+TALLER.telefonos;
+  document.getElementById('wa-info').innerHTML =
+    '<strong>'+t.matricula+'</strong> — '+t.vehiculo+'<br>'+
+    '<span style="color:var(--text2)">Presupuesto '+ultimoPresupuestoNumero+' · Total: '+ultimoPresupuestoTotal+'</span>';
+  document.getElementById('wa-mensaje').value = msg;
+  openModal('modal-whatsapp');
+}
 
 // ═══════════════════════════════════
 // WHATSAPP
