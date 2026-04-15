@@ -505,6 +505,38 @@ tbody tr:hover td{background:var(--bg2);}
 </div>
 </div>
 
+<!-- MODAL EDITAR TRABAJO -->
+<div class="modal-overlay" id="modal-editar-trabajo">
+<div class="modal">
+  <button class="modal-close" onclick="closeModal('modal-editar-trabajo')">×</button>
+  <div class="modal-title">Editar datos del trabajo</div>
+  <input type="hidden" id="et-id"/>
+  <div class="fg-row">
+    <div class="fg"><label>Matrícula *</label><input id="et-mat" style="text-transform:uppercase"/></div>
+    <div class="fg"><label>Vehículo *</label><input id="et-veh" placeholder="Marca y modelo"/></div>
+  </div>
+  <div class="fg-row">
+    <div class="fg"><label>Cliente</label><input id="et-cliente"/></div>
+    <div class="fg"><label>Teléfono</label><input id="et-tel"/></div>
+  </div>
+  <div class="fg-row">
+    <div class="fg"><label>Tipo de trabajo</label>
+      <select id="et-tipo"><option>Revisión general</option><option>Cambio de frenos</option><option>Cambio de aceite</option><option>Suspensión</option><option>Motor</option><option>Diagnóstico electrónico</option><option>Chapa y pintura</option><option>Escape</option><option>Aire acondicionado</option><option>Electricidad</option><option>Otro</option></select>
+    </div>
+    <div class="fg"><label>Mecánico</label><select id="et-mec"></select></div>
+  </div>
+  <div class="fg-row">
+    <div class="fg"><label>Precio (€)</label><input id="et-precio" type="number" min="0"/></div>
+    <div class="fg"><label>¿Urgente?</label><select id="et-urg"><option value="no">No</option><option value="si">Sí</option></select></div>
+  </div>
+  <div class="fg"><label>Observaciones</label><textarea id="et-obs"></textarea></div>
+  <div class="btn-row">
+    <button class="btn-p" onclick="guardarEdicionTrabajo()">Guardar cambios</button>
+    <button class="btn-s" onclick="closeModal('modal-editar-trabajo')">Cancelar</button>
+  </div>
+</div>
+</div>
+
 <!-- MODAL PRESUPUESTO -->
 <div class="modal-overlay" id="modal-presupuesto">
 <div class="modal">
@@ -1169,7 +1201,10 @@ function mobVerDetalle(id){
   }
 
   document.getElementById('mob-detalle-content').innerHTML=
-    '<button class="mob-back-btn" onclick="closeMobDetalle()">← Volver</button>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'+
+    '<button class="mob-back-btn" onclick="closeMobDetalle()" style="margin-bottom:0">← Volver</button>'+
+    (sesion.rol==='admin'?'<button onclick="abrirEditarTrabajo(\''+t.id+'\')" style="padding:7px 13px;border:1px solid var(--border2);border-radius:8px;font-size:13px;color:var(--text2);background:none;cursor:pointer">✏️ Editar</button>':'')+
+    '</div>'+
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'+
       '<div><div style="font-size:18px;font-weight:500">'+t.matricula+'</div>'+
       '<div style="font-size:14px;color:var(--text2)">'+t.vehiculo+'</div>'+
@@ -1435,12 +1470,42 @@ function deskRenderPresupuestos(){
       '<td style="font-weight:500;color:#185FA5">'+totalFmt+'</td>'+
       '<td>'+
         '<a class="act-link" onclick="reimprimir(\''+p.id+'\')">PDF</a>'+
+        '<a class="act-link" onclick="editarPresupuesto(\''+p.id+'\')">Editar</a>'+
         (t.tel&&t.tel!=='—'?'<a class="act-link" style="color:#25D366" onclick="waPresupuesto(\''+p.id+'\')">WhatsApp</a>':'')+
       '</td>'+
     '</tr>';
   });
   html+='</tbody></table></div></div>';
   el.innerHTML=html;
+}
+
+function editarPresupuesto(presId){
+  var p=presupuestos.find(function(x){return x.id===presId;});
+  if(!p)return;
+  presTrabajoId=p.trabajo_id;
+  var t=trabajos.find(function(j){return j.id===p.trabajo_id;})||{};
+  try{ presLineas=JSON.parse(p.lineas)||[]; }catch(e){ presLineas=[]; }
+  document.getElementById('pres-trabajo-info').innerHTML=
+    '<strong>'+(t.matricula||'—')+' — '+(t.vehiculo||'—')+'</strong><br>'+
+    'Cliente: '+(t.cliente||'—')+' · Presupuesto: '+p.numero;
+  document.getElementById('pres-descripcion').value=p.descripcion||'';
+  document.getElementById('pres-manoobra').value=p.mano_obra||0;
+  document.getElementById('pres-iva').value=p.iva||21;
+  document.getElementById('pres-lineas').innerHTML='';
+  var tmp=presLineas.slice(); presLineas=[];
+  tmp.forEach(function(l){addLineaPresupuesto(l.desc,l.qty,l.precio);});
+  calcularTotalPres();
+  // Cambiar botón a "Actualizar"
+  var btn=document.querySelector('#modal-presupuesto .btn-p');
+  btn.textContent='📄 Actualizar y generar PDF';
+  btn.onclick=function(){
+    // Borrar presupuesto antiguo y generar nuevo
+    supa('presupuestos?id=eq.'+presId,{method:'DELETE'}).then(function(){
+      presupuestos=presupuestos.filter(function(x){return x.id!==presId;});
+      generarPDF();
+    });
+  };
+  openModal('modal-presupuesto');
 }
 
 function waPresupuesto(presId){
@@ -1636,7 +1701,10 @@ function deskVerDetalle(id){
   var hs=horasMap[id]||[];
   document.getElementById('desk-detalle-content').innerHTML=
     '<button class="desk-modal-close" onclick="closeDesktopDetalle()">×</button>'+
-    '<div class="desk-modal-title">'+t.matricula+' — '+t.vehiculo+'</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'+
+    '<div class="desk-modal-title" style="margin-bottom:0">'+t.matricula+' — '+t.vehiculo+'</div>'+
+    (isAdmin?'<button onclick="abrirEditarTrabajo(\''+t.id+'\')" style="padding:7px 14px;border:1px solid var(--border2);border-radius:8px;font-size:13px;color:var(--text2);background:none;cursor:pointer">✏️ Editar datos</button>':'')+
+    '</div>'+
     '<div style="font-size:13px;color:var(--text2);margin-top:-14px;margin-bottom:16px">'+t.cliente+'</div>'+
     '<div class="desk-detail-grid">'+
       '<div>'+
@@ -1735,6 +1803,64 @@ function previewFoto(input){
 
 
 // ═══════════════════════════════════
+// EDITAR TRABAJO
+// ═══════════════════════════════════
+function abrirEditarTrabajo(id){
+  var t=trabajos.find(function(j){return j.id===id;});
+  if(!t)return;
+  document.getElementById('et-id').value=id;
+  document.getElementById('et-mat').value=t.matricula||'';
+  document.getElementById('et-veh').value=t.vehiculo||'';
+  document.getElementById('et-cliente').value=t.cliente||'';
+  document.getElementById('et-tel').value=t.tel||'';
+  document.getElementById('et-obs').value=t.obs||'';
+  document.getElementById('et-precio').value=t.precio||0;
+  document.getElementById('et-urg').value=t.urgente?'si':'no';
+  // Tipo
+  var tipoSel=document.getElementById('et-tipo');
+  for(var i=0;i<tipoSel.options.length;i++){
+    if(tipoSel.options[i].value===t.tipo){tipoSel.selectedIndex=i;break;}
+  }
+  // Mecánico
+  var mecSel=document.getElementById('et-mec');
+  mecSel.innerHTML=Object.keys(USUARIOS).filter(function(k){return USUARIOS[k].rol==='mecanico';}).map(function(k){
+    return '<option'+(USUARIOS[k].nombre===t.mecanico?' selected':'')+'>'+USUARIOS[k].nombre+'</option>';
+  }).join('');
+  openModal('modal-editar-trabajo');
+}
+
+function guardarEdicionTrabajo(){
+  var id=document.getElementById('et-id').value;
+  var t=trabajos.find(function(j){return j.id===id;});
+  if(!t)return;
+  var datos={
+    matricula:document.getElementById('et-mat').value.trim().toUpperCase(),
+    vehiculo:document.getElementById('et-veh').value.trim(),
+    cliente:document.getElementById('et-cliente').value.trim()||'—',
+    tel:document.getElementById('et-tel').value.trim()||'—',
+    tipo:document.getElementById('et-tipo').value,
+    mecanico:document.getElementById('et-mec').value,
+    precio:parseFloat(document.getElementById('et-precio').value)||0,
+    urgente:document.getElementById('et-urg').value==='si',
+    obs:document.getElementById('et-obs').value
+  };
+  if(!datos.matricula||!datos.vehiculo){showToast('Rellena matrícula y vehículo');return;}
+  var btn=document.querySelector('#modal-editar-trabajo .btn-p');
+  btn.textContent='Guardando...';btn.disabled=true;
+  supaUpdate('trabajos',id,datos).then(function(){
+    Object.assign(t,datos);
+    btn.textContent='Guardar cambios';btn.disabled=false;
+    closeModal('modal-editar-trabajo');
+    showToast('Trabajo actualizado ✓');
+    if(isMobile) mobVerDetalle(id);
+    else deskVerDetalle(id);
+  }).catch(function(){
+    btn.textContent='Guardar cambios';btn.disabled=false;
+    showToast('Error al guardar');
+  });
+}
+
+// ═══════════════════════════════════
 // PRESUPUESTO PDF
 // ═══════════════════════════════════
 var TALLER = {
@@ -1771,6 +1897,10 @@ function abrirPresupuesto(id){
   // Limpiar líneas
   document.getElementById('pres-lineas').innerHTML = '';
   calcularTotalPres();
+  // Resetear botón a "Generar"
+  var btn=document.querySelector('#modal-presupuesto .btn-p');
+  btn.textContent='📄 Generar PDF';
+  btn.onclick=generarPDF;
   openModal('modal-presupuesto');
 }
 
@@ -2053,18 +2183,17 @@ function actualizarMultitareaBar(){
 var _origCambiarEstado=cambiarEstado;
 cambiarEstado=function(id,nuevoEstado,callback){
   if(nuevoEstado==='reparacion'){
-    // Solo comprobar trabajos del mecánico actual, no de todos
     var otrosActivos=Object.keys(activeTimers).filter(function(k){
       if(k===id) return false;
       var tj=trabajos.find(function(j){return j.id===k;});
-      // Solo pedir confirmación si el trabajo es del mecánico actual
       return tj && tj.mecanico===sesion.nombre;
     });
-    if(otrosActivos.length && isMobile){
-      var t=trabajos.find(function(j){return j.id===otrosActivos[0];});
-      if(t && confirm('Tienes otro trabajo en marcha ('+t.matricula+'). ¿Lo ponemos en pausa?')){
-        _origCambiarEstado(otrosActivos[0],'pausa',null);
-      }
+    if(otrosActivos.length){
+      // Pausar automáticamente sin preguntar — evita cronómetros acumulados
+      otrosActivos.forEach(function(k){
+        _origCambiarEstado(k,'pausa',null);
+      });
+      showToast('Trabajo anterior pausado automáticamente');
     }
   }
   _origCambiarEstado(id,nuevoEstado,callback);
