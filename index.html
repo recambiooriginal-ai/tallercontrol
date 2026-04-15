@@ -2053,10 +2053,16 @@ function actualizarMultitareaBar(){
 var _origCambiarEstado=cambiarEstado;
 cambiarEstado=function(id,nuevoEstado,callback){
   if(nuevoEstado==='reparacion'){
-    var otrosActivos=Object.keys(activeTimers).filter(function(k){return k!==id;});
+    // Solo comprobar trabajos del mecánico actual, no de todos
+    var otrosActivos=Object.keys(activeTimers).filter(function(k){
+      if(k===id) return false;
+      var tj=trabajos.find(function(j){return j.id===k;});
+      // Solo pedir confirmación si el trabajo es del mecánico actual
+      return tj && tj.mecanico===sesion.nombre;
+    });
     if(otrosActivos.length && isMobile){
       var t=trabajos.find(function(j){return j.id===otrosActivos[0];});
-      if(t && confirm('Hay otro trabajo en marcha ('+t.matricula+'). ¿Lo ponemos en pausa?')){
+      if(t && confirm('Tienes otro trabajo en marcha ('+t.matricula+'). ¿Lo ponemos en pausa?')){
         _origCambiarEstado(otrosActivos[0],'pausa',null);
       }
     }
