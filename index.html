@@ -618,7 +618,16 @@ var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 function supa(path, opts){
   return fetch(SUPA_URL+'/rest/v1/'+path, Object.assign({
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'}
-  }, opts)).then(function(r){return r.json();});
+  }, opts)).then(function(r){
+    return r.json().then(function(data){
+      // Supabase devuelve errores como objetos con campo "code" o "error"
+      if(data && !Array.isArray(data) && (data.code||data.error||data.message)){
+        console.error('Supabase error:', data);
+        return Promise.reject(data.message||data.error||'Error Supabase');
+      }
+      return data;
+    });
+  });
 }
 function supaGet(table, select){
   var noOrder=['horas','usuarios'];
@@ -941,7 +950,11 @@ function crearNota(){
         deskRenderNotas();
         if(document.getElementById('desk-modal-detalle').classList.contains('open')) deskVerDetalle(jobId);
       }
-    }).catch(function(){btn.textContent='Guardar';btn.disabled=false;showToast('Error al guardar');});
+    }).catch(function(err){
+      btn.textContent='Guardar';btn.disabled=false;
+      showToast('Error al guardar nota: '+(err||'revisa Supabase RLS'));
+      console.error('Error nota:', err);
+    });
   }
 
   if(file && tipo==='foto'){
