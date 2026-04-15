@@ -396,6 +396,7 @@ tbody tr:hover td{background:var(--bg2);}
       <div class="desk-page-header"><div class="desk-page-title">Presupuestos</div></div>
       <div id="desk-pres-content"></div>
     </div>
+    <div class="desk-page" id="desk-page-mecanicos">
       <div class="desk-page-header">
         <div class="desk-page-title">Mecánicos</div>
         <button class="desk-btn-add" onclick="openModal('modal-usuario')">+ Nuevo mecánico</button>
@@ -1662,8 +1663,8 @@ function deskVerDetalle(id){
           '<button class="desk-avanzar" onclick="cambiarEstado(\''+t.id+'\',\'reparacion\',function(){deskVerDetalle(\''+t.id+'\')})">🔧 Reanudar reparación</button>':'')+
         (isAdmin&&['terminado','pausa','recambio','completado'].indexOf(t.estado)>=0?
           '<button class="desk-avanzar" style="background:#185FA5;margin-top:6px" onclick="cambiarEstado(\''+t.id+'\',\'reparacion\',function(){deskVerDetalle(\''+t.id+'\')})">🔧 Reanudar reparación</button>':'')+
-        (t.estado==='entrega'&&t.tel&&t.tel!=='—'?
-          '<button class="desk-avanzar" style="background:#25D366;margin-top:6px" onclick="mostrarWhatsApp(trabajos.find(function(j){return j.id===\''+t.id+'\'}))">📲 Enviar WhatsApp al cliente</button>':'')+
+        (t.tel&&t.tel!=='—'?
+          '<button class="desk-avanzar" style="background:#25D366;margin-top:6px" onclick="mostrarWhatsApp(trabajos.find(function(j){return j.id===\''+t.id+'\'}))">📲 WhatsApp cliente</button>':'')+
         '<button class="desk-avanzar" style="background:#185FA5;margin-top:6px" onclick="abrirPresupuesto(\''+t.id+'\')">📄 Generar presupuesto</button>'+
       '</div>'+
     '</div>'+
@@ -2016,13 +2017,18 @@ function mostrarWhatsApp(t){
 function enviarWhatsApp(){
   if(!waTrabajoActual)return;
   var tel=waTrabajoActual.tel.replace(/\s+/g,'').replace(/^\+/,'');
-  // Si el número no tiene prefijo internacional, añadir +34 (España)
   if(tel.length===9) tel='34'+tel;
   var msg=encodeURIComponent(document.getElementById('wa-mensaje').value);
   var url='https://wa.me/'+tel+'?text='+msg;
-  window.open(url,'_blank');
   closeModal('modal-whatsapp');
-  showToast('WhatsApp abierto ✓');
+  showToast('Abriendo WhatsApp ✓');
+  // En móvil usar location para evitar bloqueo de popups
+  if(isMobile){
+    window.location.href=url;
+  } else {
+    var win=window.open(url,'_blank');
+    if(!win) window.location.href=url; // fallback si popup bloqueado
+  }
 }
 // ═══════════════════════════════════
 function actualizarMultitareaBar(){
