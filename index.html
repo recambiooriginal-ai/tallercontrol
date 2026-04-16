@@ -314,7 +314,7 @@ tbody tr:hover td{background:var(--bg2);}
     <div class="mob-page" id="mob-page-horas"></div>
     <div class="mob-page" id="mob-page-notas"></div>
   </div>
-  <button class="mob-fab" onclick="openModal('modal-nuevo')">+</button>
+  <button class="mob-fab" id="mob-fab-btn" onclick="openModal('modal-nuevo')" style="display:none">+</button>
   <div class="multitarea-bar" id="multitarea-bar"></div>
 </div>
 
@@ -618,16 +618,7 @@ var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 function supa(path, opts){
   return fetch(SUPA_URL+'/rest/v1/'+path, Object.assign({
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'}
-  }, opts)).then(function(r){
-    return r.json().then(function(data){
-      // Supabase devuelve errores como objetos con campo "code" o "error"
-      if(data && !Array.isArray(data) && (data.code||data.error||data.message)){
-        console.error('Supabase error:', data);
-        return Promise.reject(data.message||data.error||'Error Supabase');
-      }
-      return data;
-    });
-  });
+  }, opts)).then(function(r){return r.json();});
 }
 function supaGet(table, select){
   var noOrder=['horas','usuarios'];
@@ -760,6 +751,9 @@ function doLogin(){
         document.getElementById('mobile-app').style.display='block';
         document.getElementById('desktop-app').style.display='none';
         document.getElementById('mob-sub').textContent=usr.nombre+' · '+(usr.rol==='admin'?'Administrador':'Mecánico');
+        // Solo el admin puede crear trabajos
+        var fab=document.getElementById('mob-fab-btn');
+        if(fab) fab.style.display=usr.rol==='admin'?'flex':'none';
         mobShowPage('inicio');
       } else {
         document.getElementById('desktop-app').style.display='block';
@@ -1034,7 +1028,7 @@ function mobRenderInicio(){
     '<div class="mob-mc"><div class="mob-mc-label">Trabajos activos</div><div class="mob-mc-val">'+activos+'</div></div>'+
     '<div class="mob-mc"><div class="mob-mc-label">Completados</div><div class="mob-mc-val">'+completados+'</div></div>'+
     '<div class="mob-mc"><div class="mob-mc-label">Horas</div><div class="mob-mc-val">'+Math.floor(mins/60)+'h</div></div>'+
-    '<div class="mob-mc"><div class="mob-mc-label">'+(sesion.rol==='admin'?'Facturado':'Mis ingresos')+'</div><div class="mob-mc-val">'+fac.toLocaleString('es-ES')+'€</div></div>'+
+    '<div class="mob-mc"><div class="mob-mc-label">'+(sesion.rol==='admin'?'Facturado':'Mis horas')+'</div><div class="mob-mc-val">'+Math.floor(mins/60)+'h '+(mins%60)+'m</div></div>'+
   '</div>';
   var recambios=ts.filter(function(t){return t.estado==='recambio';});
   if(recambios.length){
@@ -1050,10 +1044,17 @@ function mobRenderInicio(){
   if(rep.length)html+='<div class="mob-section-title">En reparación</div>'+rep.map(mobJobCard).join('');
   var pausa=ts.filter(function(t){return t.estado==='pausa';});
   if(pausa.length)html+='<div class="mob-section-title">En pausa</div>'+pausa.map(mobJobCard).join('');
-  if(!urgentes.length&&!rep.length&&!pausa.length&&!recambios.length){
-    html+='<div class="mob-section-title">Trabajos recientes</div>'+ts.slice(0,6).map(mobJobCard).join('');
+  var terminados=ts.filter(function(t){return t.estado==='terminado';});
+  if(terminados.length)html+='<div class="mob-section-title">Terminados</div>'+terminados.map(mobJobCard).join('');
+  if(!urgentes.length&&!rep.length&&!pausa.length&&!recambios.length&&!terminados.length){
+    html+='<div class="mob-section-title">Mis trabajos</div>'+
+      (ts.length?ts.slice(0,10).map(mobJobCard).join(''):
+      '<div class="empty-state" style="padding:30px 16px;text-align:center;color:var(--text2)">'+
+        '<div style="font-size:32px;margin-bottom:10px">🔧</div>'+
+        'No tienes trabajos asignados.<br>'+
+        '<span style="font-size:12px;color:var(--text3)">El administrador te asignará trabajos desde el panel.</span>'+
+      '</div>');
   }
-  if(!ts.length)html+='<div class="empty-state">Sin trabajos registrados.<br>Pulsa + para añadir el primero.</div>';
   document.getElementById('mob-page-inicio').innerHTML=html;
 }
 
