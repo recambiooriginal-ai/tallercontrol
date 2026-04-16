@@ -751,9 +751,8 @@ function doLogin(){
         document.getElementById('mobile-app').style.display='block';
         document.getElementById('desktop-app').style.display='none';
         document.getElementById('mob-sub').textContent=usr.nombre+' · '+(usr.rol==='admin'?'Administrador':'Mecánico');
-        // Solo el admin puede crear trabajos
         var fab=document.getElementById('mob-fab-btn');
-        if(fab) fab.style.display=usr.rol==='admin'?'flex':'none';
+        if(fab) fab.style.display='flex';
         mobShowPage('inicio');
       } else {
         document.getElementById('desktop-app').style.display='block';
