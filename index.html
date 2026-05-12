@@ -45,6 +45,7 @@ button{cursor:pointer;}
 .b-entrega{background:var(--green-bg);color:var(--green-text);}
 .b-completado{background:var(--gray-bg);color:var(--gray-text);}
 .b-urgente{background:var(--red-bg);color:var(--red-text);}
+.b-extra{background:#FDE8FF;color:#6B1A7A;}
 
 /* LOGIN */
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg2);padding:16px;}
@@ -243,6 +244,81 @@ tbody tr:hover td{background:var(--bg2);}
 .desk-step-line{width:1px;height:16px;background:var(--border);margin-left:5px;}
 .desk-avanzar{width:100%;padding:10px;background:var(--text);color:var(--bg);border:none;border-radius:8px;font-size:13px;font-weight:500;margin-top:12px;cursor:pointer;}
 .empty-state{text-align:center;padding:40px 20px;color:var(--text2);font-size:14px;}
+
+/* ═══ COMPARATIVA MECÁNICOS ═══ */
+.comp-wrap{margin-top:18px;}
+.comp-card{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.comp-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.comp-title{font-size:14px;font-weight:500;}
+.comp-nav{display:flex;align-items:center;gap:6px;}
+.comp-nav-btn{background:none;border:1px solid var(--border2);border-radius:7px;padding:4px 11px;font-size:12px;cursor:pointer;color:var(--text2);}
+.comp-nav-btn:hover{background:var(--bg2);color:var(--text);}
+.comp-mes-lbl{font-size:13px;font-weight:500;min-width:110px;text-align:center;color:var(--text);}
+.comp-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.comp-kpi{background:var(--bg3);border-radius:8px;padding:10px 12px;}
+.comp-kpi-val{font-size:20px;font-weight:500;line-height:1.1;}
+.comp-kpi-lbl{font-size:10px;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:.4px;}
+.comp-kpi-sub{font-size:11px;color:var(--text2);margin-top:3px;}
+.comp-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-tbl th{text-align:left;padding:7px 10px;font-size:10px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap;}
+.comp-tbl th.r{text-align:right;}
+.comp-tbl td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.comp-tbl tr:last-child td{border-bottom:none;}
+.comp-tbl tr.total-row td{font-weight:500;background:var(--bg3);font-size:11px;}
+.comp-mec-name{font-weight:500;font-size:13px;}
+.comp-bar-cell{min-width:120px;}
+.comp-bar-wrap{display:flex;align-items:center;gap:6px;}
+.comp-bar-track{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;min-width:50px;}
+.comp-bar-fill{height:100%;border-radius:3px;}
+.comp-bar-txt{font-size:11px;color:var(--text);min-width:40px;text-align:right;}
+.comp-medal{font-size:13px;margin-left:4px;}
+.comp-rank-1{color:#B8860B;font-weight:600;}
+.comp-rank-2{color:#777;font-weight:500;}
+.comp-rank-3{color:#8B5E3C;font-weight:500;}
+.veh-search-wrap{display:flex;gap:10px;margin-bottom:20px;}
+.veh-search-wrap input{flex:1;padding:11px 16px;border:1px solid var(--border2);border-radius:10px;font-size:15px;color:var(--text);background:var(--bg);outline:none;}
+.veh-search-wrap input:focus{border-color:#378ADD;}
+.veh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
+.veh-card{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:border-color .15s;}
+.veh-card:hover{border-color:var(--border2);}
+.veh-card.has-active{border-left:3px solid #7F77DD;}
+.veh-card-plate{font-size:20px;font-weight:600;letter-spacing:1px;color:var(--text);}
+.veh-card-model{font-size:13px;color:var(--text2);margin-top:2px;}
+.veh-card-client{font-size:12px;color:var(--text3);margin-top:4px;}
+.veh-card-meta{display:flex;gap:10px;margin-top:10px;align-items:center;flex-wrap:wrap;}
+.veh-ord-num{font-size:11px;background:var(--bg3);border-radius:20px;padding:3px 10px;color:var(--text2);}
+.veh-ficha{background:var(--bg);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:18px;}
+.veh-ficha-header{padding:16px 20px;background:var(--bg3);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.veh-ficha-plate{font-size:22px;font-weight:600;letter-spacing:1px;}
+.veh-ficha-model{font-size:14px;color:var(--text2);margin-top:2px;}
+.veh-ficha-back{background:none;border:1px solid var(--border2);border-radius:8px;padding:7px 14px;font-size:13px;color:var(--text2);cursor:pointer;}
+.veh-orden{border-top:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;cursor:pointer;transition:background .1s;}
+.veh-orden:hover{background:var(--bg2);}
+.veh-orden-num{font-size:13px;font-weight:600;color:var(--text3);min-width:80px;}
+.veh-orden-body{flex:1;}
+.veh-orden-title{font-size:14px;font-weight:500;color:var(--text);}
+.veh-orden-meta{font-size:12px;color:var(--text3);margin-top:3px;}
+.veh-orden-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.veh-orden-importe{font-size:14px;font-weight:500;color:#185FA5;}
+.orden-num-badge{display:inline-block;font-size:10px;font-weight:600;background:#E6F1FB;color:#0C447C;border-radius:4px;padding:2px 7px;letter-spacing:.5px;}
+/* Fichaje rápido (mecánico) */
+.fichaje-box{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;}
+.fichaje-box-title{font-size:13px;font-weight:500;color:var(--text2);margin-bottom:10px;}
+.fichaje-result{background:var(--bg3);border-radius:9px;padding:12px;margin-top:10px;font-size:13px;}
+.fichaje-result-plate{font-size:16px;font-weight:600;}
+.fichaje-result-info{font-size:12px;color:var(--text2);margin-top:3px;}
+.btn-fichaje{width:100%;margin-top:10px;padding:10px;background:#7F77DD;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;}
+.btn-fichaje:disabled{opacity:.5;cursor:not-allowed;}
+/* Mobile veh */
+.mob-veh-card{background:var(--bg);border-radius:12px;border:1px solid var(--border);padding:13px;margin-bottom:8px;cursor:pointer;}
+.mob-veh-card.has-active{border-left:3px solid #7F77DD;}
+.mob-veh-plate{font-size:18px;font-weight:600;letter-spacing:1px;}
+.mob-veh-model{font-size:13px;color:var(--text2);margin-top:2px;}
+.mob-orden-row{border-top:1px solid var(--border);padding:10px 0;display:flex;gap:10px;align-items:center;cursor:pointer;}
+.mob-orden-row:first-child{border-top:none;padding-top:0;}
+.mob-orden-body{flex:1;}
+.mob-orden-title{font-size:13px;font-weight:500;}
+.mob-orden-meta{font-size:11px;color:var(--text3);margin-top:2px;}
 </style>
 </head>
 <body>
@@ -301,7 +377,7 @@ tbody tr:hover td{background:var(--bg2);}
     <button class="mob-nav-btn" onclick="mobShowPage('trabajos')" id="mnav-trabajos"><span class="mob-nav-icon">🔧</span>Trabajos</button>
     <button class="mob-nav-btn" onclick="mobShowPage('proceso')" id="mnav-proceso"><span class="mob-nav-icon">📋</span>Proceso</button>
     <button class="mob-nav-btn" onclick="mobShowPage('horas')" id="mnav-horas"><span class="mob-nav-icon">⏱</span>Horas</button>
-    <button class="mob-nav-btn" onclick="mobShowPage('notas')" id="mnav-notas"><span class="mob-nav-icon">📝</span>Notas</button>
+    <button class="mob-nav-btn" onclick="mobShowPage('vehiculos')" id="mnav-vehiculos"><span class="mob-nav-icon">🚗</span>Vehículos</button>
   </div>
   <div class="mob-content">
     <div class="mob-page active" id="mob-page-inicio"></div>
@@ -313,6 +389,7 @@ tbody tr:hover td{background:var(--bg2);}
     <div class="mob-page" id="mob-page-proceso"></div>
     <div class="mob-page" id="mob-page-horas"></div>
     <div class="mob-page" id="mob-page-notas"></div>
+    <div class="mob-page" id="mob-page-vehiculos"></div>
   </div>
   <button class="mob-fab" id="mob-fab-btn" onclick="openModal('modal-nuevo')" style="display:none">+</button>
   <div class="multitarea-bar" id="multitarea-bar"></div>
@@ -349,6 +426,7 @@ tbody tr:hover td{background:var(--bg2);}
           <div class="desk-kanban-wrap" id="desk-kanban-dash"></div>
         </div>
       </div>
+      <div class="comp-wrap" id="desk-comp-mecanicos"></div>
     </div>
     <div class="desk-page" id="desk-page-trabajos">
       <div class="desk-page-header">
@@ -368,6 +446,10 @@ tbody tr:hover td{background:var(--bg2);}
           <option value="entrega">Entrega</option>
           <option value="completado">Completado</option>
         </select>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);cursor:pointer;white-space:nowrap">
+          <input type="checkbox" id="desk-show-comp" onchange="deskRenderTrabajos()" style="width:14px;height:14px;cursor:pointer"/>
+          <span id="desk-comp-lbl">Mostrar completados</span>
+        </label>
       </div>
       <div class="desk-card">
         <div class="tbl-wrap"><table id="desk-tbl-trab"><thead><tr><th>ID</th><th>Matrícula</th><th>Vehículo</th><th>Cliente</th><th>Trabajo</th><th>Estado</th><th>Mecánico</th><th>Horas</th><th>Urgente</th><th>Acciones</th></tr></thead><tbody></tbody></table></div>
@@ -402,6 +484,12 @@ tbody tr:hover td{background:var(--bg2);}
         <button class="desk-btn-add" onclick="openModal('modal-usuario')">+ Nuevo mecánico</button>
       </div>
       <div class="desk-card"><div class="tbl-wrap"><table><thead><tr><th>Nombre</th><th>Usuario</th><th>Especialidad</th><th>€/hora</th><th>Activos</th><th>Horas</th><th>Coste M.O.</th><th>Facturado</th><th>Acciones</th></tr></thead><tbody id="desk-tbl-mec"></tbody></table></div></div>
+    </div>
+    <div class="desk-page" id="desk-page-vehiculos">
+      <div class="desk-page-header">
+        <div class="desk-page-title">Fichas de vehículos</div>
+      </div>
+      <div id="desk-vehiculos-content"></div>
     </div>
   </div>
 </div>
@@ -649,6 +737,8 @@ var horasMap = {};
 var notas = [];
 var presupuestos = [];
 var activeTimers = {};
+var activeTimersExtra = {};   // marca timers iniciados fuera del horario laboral
+var horarioCerradoHoy = false; // evita cerrar cronómetros más de una vez al día
 
 // ═══════════════════════════════════
 // HELPERS
@@ -962,21 +1052,30 @@ function crearNota(){
 // ═══════════════════════════════════
 // CRONÓMETRO (guarda en Supabase)
 // ═══════════════════════════════════
-function startTimer(id){activeTimers[id]=Date.now();if(isMobile)mobRenderHoras();else deskRenderHoras();}
+function startTimer(id){
+  var hora=new Date().getHours();
+  var esExtra=(hora>=15||hora<7);
+  activeTimers[id]=Date.now();
+  if(esExtra){ activeTimersExtra[id]=true; showToast('⚠️ Fuera de horario laboral — se registrará como horas extra'); }
+  else{ delete activeTimersExtra[id]; }
+  if(isMobile)mobRenderHoras();else deskRenderHoras();
+}
 function stopTimer(id){
   var st=activeTimers[id];if(!st)return;
   var mins=Math.max(1,Math.round((Date.now()-st)/60000));
+  var esExtra=!!activeTimersExtra[id];
   delete activeTimers[id];
+  delete activeTimersExtra[id];
   var mecNombre=sesion?sesion.nombre:'';
   var mecKey=Object.keys(USUARIOS).find(function(k){return USUARIOS[k].nombre===mecNombre;});
   var costeHora=mecKey?(USUARIOS[mecKey].coste||0):0;
   var coste=parseFloat(((mins/60)*costeHora).toFixed(2));
-  var nuevaHora={trabajo_id:id, tipo:'Mano de obra', mins:mins, fecha:hoy(), mecanico:mecNombre, coste:coste};
+  var nuevaHora={trabajo_id:id, tipo:esExtra?'Horas extra':'Mano de obra', mins:mins, fecha:hoy(), mecanico:mecNombre, coste:coste};
   supaInsert('horas', nuevaHora).then(function(res){
     var h=res&&res[0]?res[0]:nuevaHora;
     if(!horasMap[id])horasMap[id]=[];
     horasMap[id].push(h);
-    showToast(mins+'m registrados'+(coste>0?' — '+coste+'€':'')+' ✓');
+    showToast(mins+'m registrados'+(coste>0?' — '+coste+'€':'')+(esExtra?' (horas extra)':'')+' ✓');
     if(isMobile)mobRenderHoras();else deskRenderHoras();
   });
 }
@@ -989,7 +1088,12 @@ function mobShowPage(id){
   document.querySelectorAll('.mob-nav-btn').forEach(function(b){b.classList.remove('active');});
   if(id!=='trabajos'){
     var pg=document.getElementById('mob-page-trabajos');
-    if(pg)pg.innerHTML='<div class="mob-search-bar"><input id="mob-search-t" placeholder="Buscar matrícula, vehículo..." oninput="mobRenderTrabajos()"/></div><div id="mob-trabajos-lista"></div>';
+    if(pg)pg.innerHTML='<div class="mob-search-bar"><input id="mob-search-t" placeholder="Buscar matrícula, vehículo..." oninput="mobRenderTrabajos()"/></div>'+
+      '<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);cursor:pointer;margin-bottom:10px;padding:0 4px">'+
+        '<input type="checkbox" id="mob-show-comp" onchange="mobRenderTrabajos()" style="width:14px;height:14px"/>'+
+        '<span id="mob-comp-lbl">Mostrar completados</span>'+
+      '</label>'+
+      '<div id="mob-trabajos-lista"></div>';
   }
   document.getElementById('mob-page-'+id).classList.add('active');
   var nb=document.getElementById('mnav-'+id);if(nb)nb.classList.add('active');
@@ -998,6 +1102,7 @@ function mobShowPage(id){
   else if(id==='proceso')mobRenderProceso();
   else if(id==='horas')mobRenderHoras();
   else if(id==='notas')mobRenderNotas();
+  else if(id==='vehiculos')mobRenderVehiculos();
 }
 
 function mobJobCard(t){
@@ -1005,6 +1110,7 @@ function mobJobCard(t){
     '<div class="mob-job-top">'+
       '<div>'+
         '<div class="mob-job-id">'+t.id+' · '+t.fecha+(t.urgente?' · 🔴':'')+' </div>'+
+        '<div style="margin-top:2px"><span class="orden-num-badge">'+numOrden(t)+'</span></div>'+
         '<div class="mob-job-mat">'+t.matricula+'</div>'+
         '<div class="mob-job-veh">'+t.vehiculo+'</div>'+
         '<div class="mob-job-name">'+t.cliente+'</div>'+
@@ -1059,18 +1165,28 @@ function mobRenderInicio(){
 
 function mobRenderTrabajos(){
   var q=(document.getElementById('mob-search-t')||{value:''}).value.toLowerCase();
-  var ts=misTrab().filter(function(t){
-    return !q||(t.matricula+t.vehiculo+t.cliente+t.tipo).toLowerCase().indexOf(q)>=0;
+  var mostrarComp=(document.getElementById('mob-show-comp')||{checked:false}).checked;
+  var todos=misTrab();
+  var ts=todos.filter(function(t){
+    var pasaComp=(mostrarComp||t.estado!=='completado');
+    return pasaComp&&(!q||(t.matricula+t.vehiculo+t.cliente+t.tipo).toLowerCase().indexOf(q)>=0);
   });
+  var nComp=todos.filter(function(t){return t.estado==='completado';}).length;
   var lista=document.getElementById('mob-trabajos-lista');
   if(!lista){
-    // Primera vez: crear estructura completa
     document.getElementById('mob-page-trabajos').innerHTML=
-      '<div class="mob-search-bar"><input id="mob-search-t" placeholder="Buscar matrícula, vehículo..." oninput="mobRenderTrabajos()"/></div>'+
+      '<div class="mob-search-bar"><input id="mob-search-t" placeholder="Buscar matrícula, vehículo..." oninput="mobRenderTrabajos()"/>'+
+      '</div>'+
+      '<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);cursor:pointer;margin-bottom:10px;padding:0 4px">'+
+        '<input type="checkbox" id="mob-show-comp" onchange="mobRenderTrabajos()" style="width:14px;height:14px"/>'+
+        '<span id="mob-comp-lbl">Mostrar completados ('+nComp+')</span>'+
+      '</label>'+
       '<div id="mob-trabajos-lista"></div>';
     lista=document.getElementById('mob-trabajos-lista');
   }
-  lista.innerHTML='<div class="mob-section-title">Todos los trabajos ('+ts.length+')</div>'+
+  var lbl=document.getElementById('mob-comp-lbl');
+  if(lbl) lbl.textContent='Mostrar completados ('+nComp+')';
+  lista.innerHTML='<div class="mob-section-title">Trabajos activos ('+ts.length+')</div>'+
     (ts.length?ts.map(mobJobCard).join(''):'<div class="empty-state">Sin trabajos.</div>');
 }
 
@@ -1100,7 +1216,14 @@ function mobRenderProceso(){
 function mobRenderHoras(){
   var misTrabAct=misTrab(); // trabajos donde ya he registrado horas
   var todosAct=trabajos.filter(function(t){return t.estado!=='completado';}); // todos para unirse
-  var html='';
+  // Fichaje rápido siempre arriba
+  var html='<div class="fichaje-box">'+
+    '<div class="fichaje-box-title">⚡ Fichaje rápido por matrícula</div>'+
+    '<input id="mob-fichaje-mat" placeholder="Escribe la matrícula..." '+
+      'style="width:100%;padding:10px 13px;border:1px solid var(--border2);border-radius:9px;font-size:15px;letter-spacing:1px;text-transform:uppercase;outline:none" '+
+      'oninput="this.value=this.value.toUpperCase();buscarFichajeRapido(this.value)" value="'+fichajeMatBusq+'"/>'+
+    '<div id="fichaje-resultado"></div>'+
+  '</div>';
 
   // Mis trabajos activos
   if(misTrabAct.length){
@@ -1219,7 +1342,8 @@ function mobVerDetalle(id){
     (sesion.rol==='admin'?'<button onclick="abrirEditarTrabajo(\''+t.id+'\')" style="padding:7px 13px;border:1px solid var(--border2);border-radius:8px;font-size:13px;color:var(--text2);background:none;cursor:pointer">✏️ Editar</button>':'')+
     '</div>'+
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'+
-      '<div><div style="font-size:18px;font-weight:500">'+t.matricula+'</div>'+
+      '<div><div style="margin-bottom:5px"><span class="orden-num-badge">'+numOrden(t)+'</span></div>'+
+      '<div style="font-size:18px;font-weight:500">'+t.matricula+'</div>'+
       '<div style="font-size:14px;color:var(--text2)">'+t.vehiculo+'</div>'+
       '<div style="font-size:12px;color:var(--text3)">'+t.cliente+'</div></div>'+
       badge(t.estado)+
@@ -1264,8 +1388,8 @@ function closeMobDetalle(){document.getElementById('mob-detalle-overlay').classL
 // ═══════════════════════════════════
 // ESCRITORIO — NAVEGACIÓN
 // ═══════════════════════════════════
-var NAV_ADMIN=[{id:'dashboard',label:'Dashboard'},{id:'trabajos',label:'Trabajos'},{id:'kanban',label:'Proceso (Kanban)'},{id:'horas',label:'Control de horas'},{id:'facturacion',label:'Facturación'},{id:'presupuestos',label:'Presupuestos'},{id:'notas',label:'Notas y presupuestos'},{id:'mecanicos',label:'Mecánicos'}];
-var NAV_MEC=[{id:'dashboard',label:'Mis trabajos'},{id:'kanban',label:'Proceso'},{id:'horas',label:'Mis horas'},{id:'notas',label:'Notas y presupuestos'}];
+var NAV_ADMIN=[{id:'dashboard',label:'Dashboard'},{id:'vehiculos',label:'🚗 Vehículos'},{id:'trabajos',label:'Trabajos'},{id:'kanban',label:'Proceso (Kanban)'},{id:'horas',label:'Control de horas'},{id:'facturacion',label:'Facturación'},{id:'presupuestos',label:'Presupuestos'},{id:'notas',label:'Notas y presupuestos'},{id:'mecanicos',label:'Mecánicos'}];
+var NAV_MEC=[{id:'dashboard',label:'Mis trabajos'},{id:'vehiculos',label:'🚗 Vehículos'},{id:'kanban',label:'Proceso'},{id:'horas',label:'Mis horas'},{id:'notas',label:'Notas y presupuestos'}];
 
 function deskBuildSidebar(){
   var nav=sesion.rol==='admin'?NAV_ADMIN:NAV_MEC;
@@ -1282,6 +1406,7 @@ function deskShowPage(id){
 }
 function deskRenderPage(id){
   if(id==='dashboard')deskRenderDashboard();
+  else if(id==='vehiculos')deskRenderVehiculos();
   else if(id==='trabajos')deskRenderTrabajos();
   else if(id==='kanban')deskRenderKanbanFull();
   else if(id==='horas')deskRenderHoras();
@@ -1330,36 +1455,283 @@ function deskRenderDashboard(){
       (recambios.length?'<div class="desk-mc-sub" style="color:#993C1D">'+recambios.map(function(t){return t.matricula;}).join(', ')+'</div>':'')+
     '</div>';
   var act=ts.filter(function(t){return t.estado!=='completado';});
-  document.querySelector('#desk-tbl-dash tbody').innerHTML=act.slice(0,8).map(function(t){
+  // Ordenar por prioridad: urgentes primero, luego por estado activo
+  var prioridad={reparacion:0,recambio:1,pausa:2,diagnostico:3,recepcion:4,terminado:5,entrega:6};
+  var actOrdenado=act.slice().sort(function(a,b){
+    var pa=a.urgente?-1:(prioridad[a.estado]||9);
+    var pb=b.urgente?-1:(prioridad[b.estado]||9);
+    return pa-pb;
+  });
+  document.querySelector('#desk-tbl-dash tbody').innerHTML=actOrdenado.slice(0,10).map(function(t){
     return '<tr><td>'+t.id+'</td><td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td><td>'+badge(t.estado)+'</td><td>'+t.mecanico+'</td><td>'+th(t)+'</td><td><a class="act-link" onclick="deskVerDetalle(\''+t.id+'\')">Ver</a></td></tr>';
-  }).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:20px">Sin trabajos activos</td></tr>';
+  }).join('')+
+  (act.length>10?'<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:10px;font-size:12px;cursor:pointer" onclick="deskShowPage(\'trabajos\')">+' +(act.length-10)+' trabajos más → ver todos</td></tr>':'')||
+  '<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:20px">Sin trabajos activos</td></tr>';
   deskKanbanEl('desk-kanban-dash',act);
+  if(sesion.rol==='admin') deskRenderComparativa();
+}
+
+// ═══════════════════════════════════
+// COMPARATIVA MECÁNICOS (DASHBOARD)
+// ═══════════════════════════════════
+var compMes = new Date().getMonth();   // 0-11
+var compAnio = new Date().getFullYear();
+var MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function compNavMes(delta){
+  compMes += delta;
+  if(compMes > 11){compMes = 0; compAnio++;}
+  if(compMes < 0){compMes = 11; compAnio--;}
+  deskRenderComparativa();
+}
+function compMesActual(){
+  compMes = new Date().getMonth();
+  compAnio = new Date().getFullYear();
+  deskRenderComparativa();
+}
+
+// Parsea "DD/MM/YYYY" a {mes:0-11, anio}
+function parseFecha(f){
+  if(!f) return null;
+  var p = f.split('/');
+  if(p.length < 3) return null;
+  return {d:parseInt(p[0],10), m:parseInt(p[1],10)-1, y:parseInt(p[2],10)};
+}
+function fechaEnMes(f, mes, anio){
+  var p = parseFecha(f);
+  return p && p.m === mes && p.y === anio;
+}
+
+function deskRenderComparativa(){
+  var el = document.getElementById('desk-comp-mecanicos');
+  if(!el) return;
+
+  var mecs = Object.keys(USUARIOS)
+    .filter(function(k){ return USUARIOS[k].rol === 'mecanico'; })
+    .map(function(k){ return Object.assign({key:k}, USUARIOS[k]); });
+
+  if(!mecs.length){ el.innerHTML = ''; return; }
+
+  // ── Por mecánico, calcular métricas del mes seleccionado ──────────
+  var datos = mecs.map(function(m){
+    var nombre = m.nombre;
+    var costeHora = m.coste || 0;
+
+    // Órdenes creadas en el mes asignadas a este mecánico
+    var ordenesMes = trabajos.filter(function(t){
+      return t.mecanico === nombre && fechaEnMes(t.fecha, compMes, compAnio);
+    });
+    // Trabajos activos (cualquier fecha, sin completar) del mecánico
+    var activasAhora = trabajos.filter(function(t){
+      return t.mecanico === nombre && t.estado !== 'completado';
+    });
+    // Completadas en el mes
+    var completadasMes = ordenesMes.filter(function(t){ return t.estado === 'completado'; });
+    // Facturación (precio de órdenes del mes)
+    var facturacion = ordenesMes.reduce(function(s,t){ return s + (t.precio||0); }, 0);
+    // Horas registradas en el mes (filtrar por fecha de la entrada de hora)
+    var horasMes = [], horasExtraMes = [];
+    trabajos.forEach(function(t){
+      if(t.mecanico !== nombre) return; // sólo del mecánico principal (o por nombre en hora)
+      (horasMap[t.id]||[]).forEach(function(e){
+        if((e.mecanico === nombre || !e.mecanico) && fechaEnMes(e.fecha, compMes, compAnio)){
+          if(e.tipo === 'Horas extra') horasExtraMes.push(e);
+          else horasMes.push(e);
+        }
+      });
+    });
+    var minsTrabajo = horasMes.reduce(function(s,e){ return s + e.mins; }, 0);
+    var minsExtra = horasExtraMes.reduce(function(s,e){ return s + e.mins; }, 0);
+    var costeTotal = (horasMes.concat(horasExtraMes)).reduce(function(s,e){
+      return s + (e.coste != null ? e.coste : parseFloat(((e.mins/60)*costeHora).toFixed(2)));
+    }, 0);
+    // Tiempo medio por orden (mes)
+    var tMedio = ordenesMes.length > 0 ? Math.round(minsTrabajo / ordenesMes.length) : 0;
+    // Productividad = facturación / coste (ratio, 0 si sin coste)
+    var productividad = costeTotal > 0 ? parseFloat((facturacion / costeTotal).toFixed(2)) : null;
+    // Tasa de completado (%)
+    var tasaComp = ordenesMes.length > 0 ? Math.round((completadasMes.length / ordenesMes.length) * 100) : 0;
+
+    return {
+      nombre: nombre,
+      costeHora: costeHora,
+      activas: activasAhora.length,
+      ordenes: ordenesMes.length,
+      completadas: completadasMes.length,
+      tasaComp: tasaComp,
+      minsTrabajo: minsTrabajo,
+      minsExtra: minsExtra,
+      facturacion: facturacion,
+      coste: costeTotal,
+      tMedio: tMedio,
+      productividad: productividad
+    };
+  });
+
+  // ── Totales ────────────────────────────────────────────────────────
+  var totOrdenes = datos.reduce(function(s,d){ return s + d.ordenes; }, 0);
+  var totHoras = datos.reduce(function(s,d){ return s + d.minsTrabajo; }, 0);
+  var totExtra = datos.reduce(function(s,d){ return s + d.minsExtra; }, 0);
+  var totFac = datos.reduce(function(s,d){ return s + d.facturacion; }, 0);
+  var totCoste = datos.reduce(function(s,d){ return s + d.coste; }, 0);
+  var totActivas = datos.reduce(function(s,d){ return s + d.activas; }, 0);
+
+  // ── Máximos para barras proporcionales ────────────────────────────
+  var maxOrd = Math.max(1, Math.max.apply(null, datos.map(function(d){ return d.ordenes; })));
+  var maxHrs = Math.max(1, Math.max.apply(null, datos.map(function(d){ return d.minsTrabajo; })));
+  var maxFac = Math.max(1, Math.max.apply(null, datos.map(function(d){ return d.facturacion; })));
+  var maxCoste = Math.max(1, Math.max.apply(null, datos.map(function(d){ return d.coste; })));
+  var maxExtra = Math.max(1, Math.max.apply(null, datos.map(function(d){ return d.minsExtra; })));
+
+  // ── Ranking por facturación ────────────────────────────────────────
+  var sorted = datos.slice().sort(function(a,b){ return b.facturacion - a.facturacion || b.minsTrabajo - a.minsTrabajo; });
+  var rankFac = {}; sorted.forEach(function(d,i){ rankFac[d.nombre] = i; });
+  var medals = ['🥇','🥈','🥉'];
+
+  // ── Helper: barra coloreada ────────────────────────────────────────
+  function bar(val, max, color){
+    var pct = max > 0 ? Math.round((val/max)*100) : 0;
+    return '<div class="comp-bar-track"><div class="comp-bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div>';
+  }
+  function hStr(m){ return Math.floor(m/60)+'h '+(m%60)+'m'; }
+  function eur(n){ return n.toLocaleString('es-ES',{minimumFractionDigits:0,maximumFractionDigits:0})+'€'; }
+
+  // ── KPIs del mes ──────────────────────────────────────────────────
+  var mvp = sorted[0] ? sorted[0].nombre : '—';
+  var kpis =
+    '<div class="comp-kpis">'+
+      '<div class="comp-kpi"><div class="comp-kpi-val">'+totOrdenes+'</div><div class="comp-kpi-lbl">Órdenes abiertas</div><div class="comp-kpi-sub">'+totActivas+' activas ahora</div></div>'+
+      '<div class="comp-kpi"><div class="comp-kpi-val">'+hStr(totHoras)+'</div><div class="comp-kpi-lbl">Horas trabajadas</div>'+(totExtra>0?'<div class="comp-kpi-sub" style="color:#6B1A7A">+'+hStr(totExtra)+' extra</div>':'')+'</div>'+
+      '<div class="comp-kpi"><div class="comp-kpi-val" style="color:#185FA5">'+eur(totFac)+'</div><div class="comp-kpi-lbl">Facturación</div><div class="comp-kpi-sub">Coste M.O.: '+eur(totCoste)+'</div></div>'+
+      '<div class="comp-kpi"><div class="comp-kpi-val">'+mvp+'</div><div class="comp-kpi-lbl">🏆 Más facturación</div><div class="comp-kpi-sub">'+(sorted[0]?eur(sorted[0].facturacion):'—')+'</div></div>'+
+    '</div>';
+
+  // ── Tabla comparativa ─────────────────────────────────────────────
+  var filas = datos.map(function(d){
+    var ri = rankFac[d.nombre];
+    var rankClass = ri === 0 ? 'comp-rank-1' : ri === 1 ? 'comp-rank-2' : ri === 2 ? 'comp-rank-3' : '';
+    var medal = ri < 3 ? medals[ri] : '';
+    return '<tr>'+
+      // Nombre
+      '<td><span class="comp-mec-name '+rankClass+'">'+d.nombre+medal+'</span>'+
+        '<div style="font-size:10px;color:var(--text3);margin-top:2px">'+d.costeHora+'€/h · '+d.activas+' activas</div>'+
+      '</td>'+
+      // Órdenes mes
+      '<td class="comp-bar-cell">'+
+        '<div class="comp-bar-wrap">'+bar(d.ordenes,maxOrd,'#378ADD')+'<span class="comp-bar-txt">'+d.ordenes+'</span></div>'+
+        '<div style="font-size:10px;color:var(--text3);margin-top:2px">'+d.completadas+' completadas · '+d.tasaComp+'%</div>'+
+      '</td>'+
+      // Horas trabajadas
+      '<td class="comp-bar-cell">'+
+        '<div class="comp-bar-wrap">'+bar(d.minsTrabajo,maxHrs,'#1D9E75')+'<span class="comp-bar-txt">'+hStr(d.minsTrabajo)+'</span></div>'+
+        (d.minsExtra>0?'<div style="font-size:10px;color:#6B1A7A;margin-top:2px"><span class="badge b-extra" style="font-size:9px">Extra</span> '+hStr(d.minsExtra)+'</div>':'')+
+      '</td>'+
+      // Facturación
+      '<td class="comp-bar-cell">'+
+        '<div class="comp-bar-wrap">'+bar(d.facturacion,maxFac,'#185FA5')+'<span class="comp-bar-txt" style="color:#185FA5;font-weight:500">'+eur(d.facturacion)+'</span></div>'+
+      '</td>'+
+      // Coste M.O.
+      '<td class="comp-bar-cell">'+
+        '<div class="comp-bar-wrap">'+bar(d.coste,maxCoste,'#BA7517')+'<span class="comp-bar-txt">'+eur(d.coste)+'</span></div>'+
+      '</td>'+
+      // Tiempo medio por orden
+      '<td style="text-align:center;font-size:12px;color:var(--text2)">'+
+        (d.ordenes>0 ? hStr(d.tMedio) : '—')+
+      '</td>'+
+      // Productividad (€ facturado / € coste)
+      '<td style="text-align:center">'+
+        (d.productividad !== null
+          ? '<span style="font-size:12px;font-weight:500;color:'+(d.productividad>=2?'#1D9E75':d.productividad>=1?'#BA7517':'#A32D2D')+'">×'+d.productividad+'</span>'
+          : '<span style="font-size:11px;color:var(--text3)">—</span>')+
+      '</td>'+
+    '</tr>';
+  }).join('');
+
+  // Fila de totales
+  var filaTotal = '<tr class="total-row">'+
+    '<td>TOTAL / MES</td>'+
+    '<td>'+totOrdenes+' órdenes</td>'+
+    '<td>'+hStr(totHoras)+(totExtra>0?' <span style="color:#6B1A7A;font-size:10px">+'+hStr(totExtra)+' extra</span>':'')+'</td>'+
+    '<td style="color:#185FA5">'+eur(totFac)+'</td>'+
+    '<td>'+eur(totCoste)+'</td>'+
+    '<td></td><td></td>'+
+  '</tr>';
+
+  var tabla =
+    '<div style="overflow-x:auto">'+
+    '<table class="comp-tbl">'+
+      '<thead><tr>'+
+        '<th>Mecánico</th>'+
+        '<th>Órdenes del mes</th>'+
+        '<th>Horas trabajadas</th>'+
+        '<th class="r">Facturación</th>'+
+        '<th class="r">Coste M.O.</th>'+
+        '<th style="text-align:center">T. medio/orden</th>'+
+        '<th style="text-align:center">Productividad</th>'+
+      '</tr></thead>'+
+      '<tbody>'+filas+filaTotal+'</tbody>'+
+    '</table></div>'+
+    '<div style="font-size:11px;color:var(--text3);margin-top:8px">'+
+      '* Productividad = facturación ÷ coste M.O. del mes. '+
+      '× 2 = por cada euro de mano de obra se facturan 2€. '+
+      'Órdenes y horas filtradas por fecha de creación / registro del mes seleccionado.'+
+    '</div>';
+
+  var esMesActual = compMes === new Date().getMonth() && compAnio === new Date().getFullYear();
+  el.innerHTML =
+    '<div class="comp-card">'+
+      '<div class="comp-card-head">'+
+        '<span class="comp-title">📊 Comparativa de mecánicos</span>'+
+        '<div class="comp-nav">'+
+          '<button class="comp-nav-btn" onclick="compNavMes(-1)">‹ Anterior</button>'+
+          '<span class="comp-mes-lbl">'+MESES_ES[compMes]+' '+compAnio+'</span>'+
+          '<button class="comp-nav-btn" onclick="compNavMes(1)">Siguiente ›</button>'+
+          (!esMesActual?'<button class="comp-nav-btn" onclick="compMesActual()" style="color:#185FA5">Hoy</button>':'')+
+        '</div>'+
+      '</div>'+
+      kpis+
+      tabla+
+    '</div>';
 }
 
 function deskRenderTrabajos(){
   var q=(document.getElementById('desk-search')||{value:''}).value.toLowerCase();
   var ef=(document.getElementById('desk-filter')||{value:''}).value;
-  var ts=misTrab().filter(function(t){
-    return (!q||(t.matricula+t.vehiculo+t.cliente+t.tipo).toLowerCase().indexOf(q)>=0)&&(!ef||t.estado===ef);
+  var mostrarComp=(document.getElementById('desk-show-comp')||{checked:false}).checked;
+  var todos=misTrab();
+  var ts=todos.filter(function(t){
+    var pasaEstado=(!ef||t.estado===ef);
+    var pasaComp=(ef==='completado'||mostrarComp||t.estado!=='completado');
+    return pasaEstado&&pasaComp&&(!q||(t.matricula+t.vehiculo+t.cliente+t.tipo).toLowerCase().indexOf(q)>=0);
   });
+  var nComp=todos.filter(function(t){return t.estado==='completado';}).length;
+  // Actualizar etiqueta del checkbox
+  var lbl=document.getElementById('desk-comp-lbl');
+  if(lbl) lbl.textContent='Mostrar completados ('+nComp+')';
   document.querySelector('#desk-tbl-trab tbody').innerHTML=ts.map(function(t){
-    return '<tr><td>'+t.id+'</td><td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td><td style="color:var(--text2)">'+t.cliente+'</td><td>'+t.tipo+'</td><td>'+badge(t.estado)+'</td><td>'+t.mecanico+'</td><td>'+th(t)+'</td>'+
+    return '<tr'+(t.estado==='completado'?' style="opacity:.55"':'')+'>'+
+      '<td>'+t.id+'</td><td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td><td style="color:var(--text2)">'+t.cliente+'</td><td>'+t.tipo+'</td><td>'+badge(t.estado)+'</td><td>'+t.mecanico+'</td><td>'+th(t)+'</td>'+
       '<td>'+(t.urgente?'<span class="badge b-urgente">Urgente</span>':'')+'</td>'+
       '<td><a class="act-link" onclick="deskVerDetalle(\''+t.id+'\')">Detalle</a>'+(EN[t.estado]?'<a class="act-link" onclick="avanzar(\''+t.id+'\',function(){deskRenderTrabajos()})">Avanzar →</a>':'')+'</td></tr>';
   }).join('')||'<tr><td colspan="10" style="text-align:center;color:var(--text2);padding:20px">Sin trabajos</td></tr>';
 }
 
 var dragId=null;
-function deskKanbanEl(elId,ts){
+function deskKanbanEl(elId,ts,maxPorCol){
+  var isDash=(elId==='desk-kanban-dash');
+  var limite=maxPorCol||(isDash?5:9999);
   var cols=ESTADOS.filter(function(e){return e!=='completado';});
   document.getElementById(elId).innerHTML=cols.map(function(e){
     var items=ts.filter(function(t){return t.estado===e;});
+    var visibles=items.slice(0,limite);
+    var ocultos=items.length-visibles.length;
     var alerta=items.length>=3?' <span style="background:#FAECE7;color:#712B13;border-radius:20px;padding:1px 7px;font-size:10px">!</span>':'';
     return '<div class="desk-kcol" data-estado="'+e+'" id="kcol-'+elId+'-'+e+'" ondragover="event.preventDefault();this.classList.add(\'drag-over\')" ondragleave="this.classList.remove(\'drag-over\')" ondrop="dropEnEstado(event,\''+e+'\',\''+elId+'\')" >'+
       '<div class="desk-kcol-head kch-'+e+'">'+EL[e]+' ('+items.length+')'+alerta+'</div>'+
       '<div class="desk-kcol-drop"></div>'+
-      items.map(function(t){
+      visibles.map(function(t){
         return '<div class="desk-kitem" data-id="'+t.id+'" draggable="true" ondragstart="dragId=\''+t.id+'\';this.classList.add(\'dragging\')" ondragend="this.classList.remove(\'dragging\')" onclick="deskVerDetalle(\''+t.id+'\')">'+
+          '<div style="margin-bottom:3px"><span class="orden-num-badge">'+numOrden(t)+'</span></div>'+
           '<div class="desk-ki-mat">'+t.matricula+'</div>'+
           '<div class="desk-ki-veh">'+t.vehiculo+'</div>'+
           '<div class="desk-ki-cli">'+t.cliente+'</div>'+
@@ -1367,6 +1739,7 @@ function deskKanbanEl(elId,ts){
           (activeTimers[t.id]?'<div style="margin-top:4px;font-size:10px;color:#7F77DD">⬤ Cronómetro activo</div>':'')+
         '</div>';
       }).join('')+
+      (ocultos>0?'<div onclick="deskShowPage(\'kanban\')" style="text-align:center;padding:8px 6px;font-size:11px;color:var(--text2);cursor:pointer;border:1px dashed var(--border2);border-radius:8px;margin-top:2px">+'+ocultos+' más → ver todos</div>':'')+
     '</div>';
   }).join('');
 }
@@ -1383,6 +1756,315 @@ function dropEnEstado(event,nuevoEstado,elId){
   dragId=null;
 }
 function deskRenderKanbanFull(){deskKanbanEl('desk-kanban-full',misTrab());}
+
+// ═══════════════════════════════════
+// FICHAS DE VEHÍCULO
+// ═══════════════════════════════════
+
+// Número de orden interno: cuenta cuántas órdenes anteriores tiene la misma matrícula
+// y devuelve "MAT-001", "MAT-002"...
+function numOrden(t){
+  var mat=t.matricula;
+  var todas=trabajos.filter(function(j){return j.matricula===mat;});
+  todas.sort(function(a,b){return (a.fecha||'').localeCompare(b.fecha||'')||(a.id||'').localeCompare(b.id||'');});
+  var idx=todas.findIndex(function(j){return j.id===t.id;});
+  var n=(idx>=0?idx+1:todas.length);
+  return mat+'-'+('000'+n).slice(-3);
+}
+
+// Devuelve array de matrículas únicas con info del último trabajo
+function vehiculosUnicos(query){
+  var q=(query||'').toLowerCase().trim();
+  var map={};
+  trabajos.forEach(function(t){
+    var mat=t.matricula;
+    if(!map[mat]||t.fecha>map[mat].fecha) map[mat]=t;
+  });
+  var lista=Object.values(map);
+  if(q) lista=lista.filter(function(t){
+    return (t.matricula+t.vehiculo+(t.cliente||'')).toLowerCase().indexOf(q)>=0;
+  });
+  lista.sort(function(a,b){
+    // Primero los que tienen órdenes activas
+    var aAct=trabajos.some(function(j){return j.matricula===a.matricula&&j.estado!=='completado';});
+    var bAct=trabajos.some(function(j){return j.matricula===b.matricula&&j.estado!=='completado';});
+    if(aAct&&!bAct)return -1; if(bAct&&!aAct)return 1;
+    return (b.fecha||'').localeCompare(a.fecha||'');
+  });
+  return lista;
+}
+
+function ordenesDeVehiculo(matricula){
+  return trabajos.filter(function(t){return t.matricula===matricula;})
+    .sort(function(a,b){return (b.fecha||'').localeCompare(a.fecha||'')||(b.id||'').localeCompare(a.id||'');});
+}
+
+function totalHorasOrden(t){
+  var hs=horasMap[t.id]||[];
+  var m=hs.reduce(function(s,e){return s+e.mins;},0);
+  if(activeTimers[t.id]) m+=Math.round((Date.now()-activeTimers[t.id])/60000);
+  return m;
+}
+
+function totalPresOrden(t){
+  var ps=presupuestos.filter(function(p){return p.trabajo_id===t.id;});
+  return ps.reduce(function(s,p){return s+(p.total||0);},0);
+}
+
+function renderOrdenRow(t, forMob){
+  var on=numOrden(t);
+  var mins=totalHorasOrden(t);
+  var hStr=Math.floor(mins/60)+'h '+(mins%60)+'m';
+  var presTotal=totalPresOrden(t);
+  var presFmt=presTotal>0?presTotal.toLocaleString('es-ES',{minimumFractionDigits:2})+'€':'—';
+  var esActiva=t.estado!=='completado';
+  if(forMob){
+    return '<div class="mob-orden-row" onclick="'+(isMobile?'mobVerDetalle':'deskVerDetalle')+'(\''+t.id+'\')">' +
+      '<div style="min-width:90px"><span class="orden-num-badge">'+on+'</span><div style="font-size:10px;color:var(--text3);margin-top:4px">'+t.fecha+'</div></div>'+
+      '<div class="mob-orden-body">'+
+        '<div class="mob-orden-title">'+t.tipo+(t.urgente?' 🔴':'')+' <span>'+badge(t.estado)+'</span></div>'+
+        '<div class="mob-orden-meta">'+t.mecanico+' · '+hStr+(presTotal>0?' · '+presFmt:'')+'</div>'+
+      '</div>'+
+    '</div>';
+  }
+  return '<div class="veh-orden" onclick="deskVerDetalle(\''+t.id+'\')">'+
+    '<div class="veh-orden-num"><span class="orden-num-badge">'+on+'</span><div style="font-size:10px;color:var(--text3);margin-top:5px">'+t.fecha+'</div></div>'+
+    '<div class="veh-orden-body">'+
+      '<div class="veh-orden-title">'+t.tipo+(t.urgente?' 🔴':'')+'</div>'+
+      '<div class="veh-orden-meta">'+t.mecanico+' · Obs: '+(t.obs||'—')+'</div>'+
+    '</div>'+
+    '<div style="display:flex;align-items:center;gap:12px">'+badge(t.estado)+'</div>'+
+    '<div class="veh-orden-right">'+
+      '<span style="font-size:12px;color:var(--text2)">'+hStr+'</span>'+
+      '<span class="veh-orden-importe">'+presFmt+'</span>'+
+    '</div>'+
+  '</div>';
+}
+
+// ─── FICHAJE RÁPIDO ──────────────────────────────────────────────
+// Busca si hay una orden activa para una matrícula y permite al mecánico ficharse
+var fichajeMatBusq='';
+function buscarFichajeRapido(mat){
+  fichajeMatBusq=mat.trim().toUpperCase();
+  var res=document.getElementById('fichaje-resultado');
+  if(!res)return;
+  if(!fichajeMatBusq){res.innerHTML='';return;}
+  var activas=trabajos.filter(function(t){return t.matricula===fichajeMatBusq&&t.estado!=='completado';});
+  if(!activas.length){
+    res.innerHTML='<div class="fichaje-result" style="color:var(--text3)">No hay órdenes activas para <strong>'+fichajeMatBusq+'</strong>.</div>';
+    return;
+  }
+  var html=activas.map(function(t){
+    var on=numOrden(t);
+    var yaFichado=!!activeTimers[t.id];
+    return '<div class="fichaje-result">'+
+      '<div class="fichaje-result-plate">'+t.matricula+'</div>'+
+      '<div class="fichaje-result-info">'+t.vehiculo+' · '+t.cliente+' · '+badge(t.estado)+'</div>'+
+      '<div style="font-size:11px;color:var(--text3);margin-top:4px">Orden: <span class="orden-num-badge">'+on+'</span> · Mec. asignado: '+t.mecanico+'</div>'+
+      (yaFichado
+        ?'<div style="margin-top:8px;font-size:12px;color:#7F77DD;font-weight:500">⬤ Tu cronómetro está activo en esta orden</div>'
+        :'<button class="btn-fichaje" onclick="fichajeRapido(\''+t.id+'\')">▶ Ficharme en esta orden</button>'
+      )+
+    '</div>';
+  }).join('');
+  res.innerHTML=html;
+}
+
+function fichajeRapido(jobId){
+  var t=trabajos.find(function(j){return j.id===jobId;});
+  if(!t){showToast('Trabajo no encontrado');return;}
+  // Si el trabajo está asignado a otro mecánico, actualizar a co-mecánico (no cambiamos el mecanico principal)
+  startTimer(jobId);
+  // Si el estado es recepcion/diagnostico, avanzar a reparacion automáticamente
+  if(t.estado==='recepcion'||t.estado==='diagnostico'){
+    cambiarEstado(jobId,'reparacion',function(){
+      buscarFichajeRapido(fichajeMatBusq);
+      if(isMobile)mobRenderHoras();else deskRenderHoras();
+    });
+  } else {
+    buscarFichajeRapido(fichajeMatBusq);
+    showToast('Fichado en '+t.matricula+' ✓');
+    if(isMobile)mobRenderHoras();else deskRenderHoras();
+  }
+}
+
+// ─── DESKTOP: Render vehículos ───────────────────────────────────
+var vehFichaActual=null; // matrícula del historial abierto
+
+function deskRenderVehiculos(){
+  var el=document.getElementById('desk-vehiculos-content');
+  if(vehFichaActual){
+    deskRenderFichaVehiculo(vehFichaActual);
+    return;
+  }
+  var q=(document.getElementById('veh-desk-search')||{value:''}).value||'';
+  var lista=vehiculosUnicos(q);
+  var html=
+    '<div class="veh-search-wrap">'+
+      '<input id="veh-desk-search" placeholder="🔍  Buscar por matrícula, vehículo o cliente..." oninput="deskRenderVehiculos()" value="'+q.replace(/"/g,'&quot;')+'"/>'+
+    '</div>';
+  if(!lista.length){
+    html+='<div class="empty-state">Sin vehículos. Crea un trabajo para registrar el primer vehículo.</div>';
+    el.innerHTML=html; return;
+  }
+  html+='<div class="veh-grid">'+lista.map(function(t){
+    var mat=t.matricula;
+    var ordenes=trabajos.filter(function(j){return j.matricula===mat;});
+    var activa=ordenes.find(function(j){return j.estado!=='completado';});
+    var totalOrd=ordenes.length;
+    var totalPres=ordenes.reduce(function(s,j){return s+totalPresOrden(j);},0);
+    var totalMins=ordenes.reduce(function(s,j){return s+totalHorasOrden(j);},0);
+    return '<div class="veh-card'+(activa?' has-active':'')+'" onclick="vehFichaActual=\''+mat+'\';deskRenderVehiculos()">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div>'+
+          '<div class="veh-card-plate">'+mat+'</div>'+
+          '<div class="veh-card-model">'+t.vehiculo+'</div>'+
+          '<div class="veh-card-client">'+t.cliente+'</div>'+
+        '</div>'+
+        (activa?badge(activa.estado):'<span class="badge b-completado">Completado</span>')+
+      '</div>'+
+      '<div class="veh-card-meta">'+
+        '<span class="veh-ord-num">'+totalOrd+' orden'+(totalOrd!==1?'es':'')+'</span>'+
+        '<span class="veh-ord-num">'+Math.floor(totalMins/60)+'h '+(totalMins%60)+'m</span>'+
+        (totalPres>0?'<span class="veh-ord-num" style="color:#185FA5">'+totalPres.toLocaleString('es-ES',{minimumFractionDigits:2})+'€</span>':'')+
+      '</div>'+
+    '</div>';
+  }).join('')+'</div>';
+  el.innerHTML=html;
+}
+
+function deskRenderFichaVehiculo(mat){
+  var el=document.getElementById('desk-vehiculos-content');
+  var ordenes=ordenesDeVehiculo(mat);
+  if(!ordenes.length){vehFichaActual=null;deskRenderVehiculos();return;}
+  var rep=ordenes[0]; // más reciente
+  var activa=ordenes.find(function(t){return t.estado!=='completado';});
+  var totalMins=ordenes.reduce(function(s,t){return s+totalHorasOrden(t);},0);
+  var totalPres=ordenes.reduce(function(s,t){return s+totalPresOrden(t);},0);
+  var html=
+    '<div class="veh-ficha">'+
+      '<div class="veh-ficha-header">'+
+        '<div>'+
+          '<div style="display:flex;align-items:center;gap:10px">'+
+            '<div class="veh-ficha-plate">'+mat+'</div>'+
+            (activa?badge(activa.estado):'<span class="badge b-completado">Sin órdenes activas</span>')+
+          '</div>'+
+          '<div class="veh-ficha-model">'+rep.vehiculo+' · '+rep.cliente+(rep.tel&&rep.tel!=='—'?' · 📞 '+rep.tel:'')+'</div>'+
+        '</div>'+
+        '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
+          '<div style="text-align:center;background:var(--bg);border-radius:8px;padding:8px 14px;min-width:80px">'+
+            '<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Órdenes</div>'+
+            '<div style="font-size:20px;font-weight:500">'+ordenes.length+'</div>'+
+          '</div>'+
+          '<div style="text-align:center;background:var(--bg);border-radius:8px;padding:8px 14px;min-width:80px">'+
+            '<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Horas total</div>'+
+            '<div style="font-size:20px;font-weight:500">'+Math.floor(totalMins/60)+'h</div>'+
+          '</div>'+
+          (totalPres>0?
+            '<div style="text-align:center;background:var(--bg);border-radius:8px;padding:8px 14px;min-width:80px">'+
+              '<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Facturado</div>'+
+              '<div style="font-size:20px;font-weight:500;color:#185FA5">'+totalPres.toLocaleString('es-ES',{minimumFractionDigits:2})+'€</div>'+
+            '</div>':'')+
+          '<button class="veh-ficha-back" onclick="vehFichaActual=null;deskRenderVehiculos()">← Volver</button>'+
+        '</div>'+
+      '</div>'+
+      ordenes.map(function(t){return renderOrdenRow(t,false);}).join('')+
+    '</div>';
+  // Si hay una orden activa y el usuario es mecánico, mostrar fichaje rápido
+  if(activa&&sesion.rol!=='admin'){
+    var on=numOrden(activa);
+    var yaFichado=!!activeTimers[activa.id];
+    html='<div class="fichaje-box" style="margin-bottom:16px">'+
+      '<div class="fichaje-box-title">Orden activa: <span class="orden-num-badge">'+on+'</span></div>'+
+      '<div class="fichaje-result">'+
+        '<div class="fichaje-result-plate">'+activa.matricula+'</div>'+
+        '<div class="fichaje-result-info">'+activa.vehiculo+' · '+activa.cliente+' · '+badge(activa.estado)+'</div>'+
+        (yaFichado
+          ?'<div style="margin-top:8px;font-size:12px;color:#7F77DD;font-weight:500">⬤ Tu cronómetro está activo en esta orden</div>'
+          :'<button class="btn-fichaje" onclick="fichajeRapido(\''+activa.id+'\');vehFichaActual=\''+mat+'\';deskRenderVehiculos()">▶ Ficharme en esta orden</button>'
+        )+
+      '</div>'+
+    '</div>'+html;
+  }
+  el.innerHTML=html;
+}
+
+// ─── MOBILE: Render vehículos ────────────────────────────────────
+var mobVehFichaActual=null;
+
+function mobRenderVehiculos(){
+  var el=document.getElementById('mob-page-vehiculos');
+  if(mobVehFichaActual){mobRenderFichaVehiculo(mobVehFichaActual);return;}
+  var q=(document.getElementById('mob-veh-search')||{value:''}).value||'';
+  var lista=vehiculosUnicos(q);
+  var html=
+    '<div class="mob-search-bar"><input id="mob-veh-search" placeholder="🔍 Matrícula, vehículo o cliente..." oninput="mobRenderVehiculos()" value="'+q.replace(/"/g,'&quot;')+'"/></div>'+
+    '<div class="mob-section-title">'+lista.length+' vehículo'+(lista.length!==1?'s':'')+'</div>';
+  html+=lista.map(function(t){
+    var mat=t.matricula;
+    var ordenes=trabajos.filter(function(j){return j.matricula===mat;});
+    var activa=ordenes.find(function(j){return j.estado!=='completado';});
+    var totalMins=ordenes.reduce(function(s,j){return s+totalHorasOrden(j);},0);
+    return '<div class="mob-veh-card'+(activa?' has-active':'')+'" onclick="mobVehFichaActual=\''+mat+'\';mobRenderVehiculos()">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div><div class="mob-veh-plate">'+mat+'</div><div class="mob-veh-model">'+t.vehiculo+'</div><div style="font-size:11px;color:var(--text3)">'+t.cliente+'</div></div>'+
+        (activa?badge(activa.estado):'<span class="badge b-completado">Sin activas</span>')+
+      '</div>'+
+      '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">'+
+        '<span class="veh-ord-num">'+ordenes.length+' orden'+(ordenes.length!==1?'es':'')+'</span>'+
+        '<span class="veh-ord-num">'+Math.floor(totalMins/60)+'h '+(totalMins%60)+'m total</span>'+
+      '</div>'+
+    '</div>';
+  }).join('')||(q?'<div class="empty-state">Sin resultados para "'+q+'"</div>':'<div class="empty-state">Sin vehículos registrados aún.</div>');
+  el.innerHTML=html;
+}
+
+function mobRenderFichaVehiculo(mat){
+  var el=document.getElementById('mob-page-vehiculos');
+  var ordenes=ordenesDeVehiculo(mat);
+  if(!ordenes.length){mobVehFichaActual=null;mobRenderVehiculos();return;}
+  var rep=ordenes[0];
+  var activa=ordenes.find(function(t){return t.estado!=='completado';});
+  var totalMins=ordenes.reduce(function(s,t){return s+totalHorasOrden(t);},0);
+  var totalPres=ordenes.reduce(function(s,t){return s+totalPresOrden(t);},0);
+  var fichajeHtml='';
+  if(activa){
+    var on=numOrden(activa);
+    var yaFichado=!!activeTimers[activa.id];
+    fichajeHtml='<div class="fichaje-box">'+
+      '<div class="fichaje-box-title">Orden activa: <span class="orden-num-badge">'+on+'</span></div>'+
+      '<div class="fichaje-result">'+
+        '<div class="fichaje-result-info">'+badge(activa.estado)+' · '+activa.mecanico+'</div>'+
+        (yaFichado
+          ?'<div style="margin-top:8px;font-size:12px;color:#7F77DD;font-weight:500">⬤ Tu cronómetro está activo</div>'
+          :'<button class="btn-fichaje" onclick="fichajeRapido(\''+activa.id+'\');mobVehFichaActual=\''+mat+'\';mobRenderVehiculos()">▶ Ficharme en esta orden</button>'
+        )+
+      '</div>'+
+    '</div>';
+  }
+  var html=
+    '<button class="mob-back-btn" onclick="mobVehFichaActual=null;mobRenderVehiculos()" style="margin-bottom:12px">← Volver</button>'+
+    '<div class="mob-det-section" style="margin-bottom:10px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div><div style="font-size:20px;font-weight:600;letter-spacing:1px">'+mat+'</div>'+
+        '<div style="font-size:13px;color:var(--text2)">'+rep.vehiculo+'</div>'+
+        '<div style="font-size:12px;color:var(--text3)">'+rep.cliente+(rep.tel&&rep.tel!=='—'?' · '+rep.tel:'')+'</div></div>'+
+        (activa?badge(activa.estado):'<span class="badge b-completado">Sin activas</span>')+
+      '</div>'+
+      '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">'+
+        '<span class="veh-ord-num">'+ordenes.length+' órdenes</span>'+
+        '<span class="veh-ord-num">'+Math.floor(totalMins/60)+'h '+(totalMins%60)+'m</span>'+
+        (totalPres>0?'<span class="veh-ord-num" style="color:#185FA5">'+totalPres.toLocaleString('es-ES',{minimumFractionDigits:2})+'€</span>':'')+
+      '</div>'+
+    '</div>'+
+    fichajeHtml+
+    '<div class="mob-section-title">Historial de órdenes</div>'+
+    '<div class="mob-det-section">'+
+      ordenes.map(function(t){return renderOrdenRow(t,true);}).join('')+
+    '</div>';
+  el.innerHTML=html;
+}
+
 
 function deskRenderHoras(){
   var isAdmin=sesion.rol==='admin';
@@ -1409,8 +2091,20 @@ function deskRenderHoras(){
     var costeEntry=e.coste!=null?e.coste:parseFloat(((e.mins/60)*costeHora).toFixed(2));
     totalMins+=e.mins;totalCoste+=costeEntry;
     rows+=isAdmin
-      ?'<tr><td>'+mecNombre+'</td><td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td><td>'+e.tipo+'</td><td>'+Math.floor(e.mins/60)+'h '+(e.mins%60)+'m</td><td>'+costeHora+'€/h</td><td style="color:#185FA5"><strong>'+costeEntry.toFixed(0)+'€</strong></td><td>'+e.fecha+'</td></tr>'
-      :'<tr><td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td><td>'+e.tipo+'</td><td>'+Math.floor(e.mins/60)+'h '+(e.mins%60)+'m</td><td style="color:#185FA5">'+costeEntry.toFixed(0)+'€</td><td>'+e.fecha+'</td></tr>';
+      ?'<tr'+(e.tipo==='Horas extra'?' style="background:#FDE8FF"':'')+'>'+
+        '<td>'+mecNombre+(e.tipo==='Horas extra'?' <span class="badge b-extra">Extra</span>':'')+'</td>'+
+        '<td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td>'+
+        '<td>'+e.tipo+'</td>'+
+        '<td>'+Math.floor(e.mins/60)+'h '+(e.mins%60)+'m</td>'+
+        '<td>'+costeHora+'€/h</td>'+
+        '<td style="color:#185FA5"><strong>'+costeEntry.toFixed(0)+'€</strong></td>'+
+        '<td>'+e.fecha+'</td></tr>'
+      :'<tr'+(e.tipo==='Horas extra'?' style="background:#FDE8FF"':'')+'>'+
+        '<td><strong>'+t.matricula+'</strong></td><td>'+t.vehiculo+'</td>'+
+        '<td>'+e.tipo+(e.tipo==='Horas extra'?' <span class="badge b-extra">Extra</span>':'')+'</td>'+
+        '<td>'+Math.floor(e.mins/60)+'h '+(e.mins%60)+'m</td>'+
+        '<td style="color:#185FA5">'+costeEntry.toFixed(0)+'€</td>'+
+        '<td>'+e.fecha+'</td></tr>';
   });
   var html='<div class="desk-card"><div class="tbl-wrap"><table><thead><tr>'+header+'</tr></thead><tbody>'+
     (rows||'<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:20px">Sin horas registradas</td></tr>')+
@@ -2319,6 +3013,31 @@ function initTouchDrag(){
 }
 
 // ═══════════════════════════════════
+// CIERRE AUTOMÁTICO DE JORNADA (7-15h)
+// ═══════════════════════════════════
+function checkCierreHorario(){
+  var ahora=new Date();
+  var hora=ahora.getHours();
+  var min=ahora.getMinutes();
+  // Reiniciar flag al comienzo de la jornada
+  if(hora===7&&min<2) horarioCerradoHoy=false;
+  // Cerrar cronómetros activos al llegar las 15:00
+  if(hora>=15&&!horarioCerradoHoy){
+    var ids=Object.keys(activeTimers);
+    if(ids.length){
+      horarioCerradoHoy=true;
+      ids.forEach(function(id){ stopTimerSilente(id); });
+      showToast('🕒 Fin de jornada (15:00) — cronómetros cerrados automáticamente');
+      setTimeout(function(){
+        if(isMobile)mobRenderHoras();else deskRenderHoras();
+      },500);
+    } else {
+      horarioCerradoHoy=true;
+    }
+  }
+}
+
+// ═══════════════════════════════════
 // AUTO-REFRESCO
 // ═══════════════════════════════════
 var autoRefreshInterval=null;
@@ -2338,6 +3057,7 @@ function iniciarAutoRefresh(){
         if(dpag){var did=dpag.id.replace('desk-page-','');if(did==='dashboard'||did==='horas')deskRenderDashboard();}
       }
     }
+    checkCierreHorario();
     actualizarMultitareaBar();
   }, 60000);
 
